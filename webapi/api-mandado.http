@@ -2,5 +2,7 @@
 
 GET {{api_mandado_HostAddress}}/weatherforecast/
 Accept: application/json
-
 ###
+GET {{api_mandado_HostAddress}}/api/products/
+Accept: application/json
+
