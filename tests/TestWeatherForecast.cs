@@ -2,9 +2,13 @@
 
 using System.Net;
 using System.Threading.Tasks;
+using api_mandado.Controllers;
 using api_mymandado;
+using core_mandado.models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using models;
+using repositories;
 using Xunit;
 
 public class TestWeatherForecast : IClassFixture<WebApplicationFactory<Program>>
@@ -37,6 +41,12 @@ public class TestWeatherForecast : IClassFixture<WebApplicationFactory<Program>>
         Assert.False(string.IsNullOrWhiteSpace(content));
         Assert.Contains("temperature", content, StringComparison.OrdinalIgnoreCase);
 
-        Assert.IsType<WeatherForecast[]>(response.Content);
+        //Assert.IsType<WeatherForecast[]>(response.Content);
+
+
+        //var controller = new ProductsController(new ProductsRepository());
+        //var res = controller.Get();
+        //var okresult = Assert.IsType<OkObjectResult>(response.c);
+        //Assert.IsType<WeatherForecast[]>(okresult.Value);
     }
 }

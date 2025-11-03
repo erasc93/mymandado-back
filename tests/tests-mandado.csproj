@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <UserSecretsId>cf36d4e8-8a9f-4a6d-995f-8324e563f667</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\core\core-mandado.csproj" />
     <ProjectReference Include="..\webapi\api-mandado.csproj" />
+    <ProjectReference Include="..\dataaccess\mnd-dataaccess.csproj" />
   </ItemGroup>
 
 </Project>

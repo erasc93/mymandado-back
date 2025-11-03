@@ -3,17 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests-mandado", "tests\tests-mandado.csproj", "{73F98EC5-C52A-415D-810D-268E9D388849}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{FBF56CC3-7AE6-AD2D-3F14-7F97FD322CD6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "core-mandado", "core\core-mandado.csproj", "{4A9E086A-996D-4817-937E-8EE53E63CE2C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "webapi", "webapi", "{6EDC7094-E22D-CF10-605B-B42C7FB8B0A8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "api-mandado", "webapi\api-mandado.csproj", "{B714660E-F98E-4266-A984-FD9D38702626}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mnd-dataaccess", "dataaccess\mnd-dataaccess.csproj", "{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,13 +57,20 @@ Global
 		{B714660E-F98E-4266-A984-FD9D38702626}.Release|x64.Build.0 = Release|Any CPU
 		{B714660E-F98E-4266-A984-FD9D38702626}.Release|x86.ActiveCfg = Release|Any CPU
 		{B714660E-F98E-4266-A984-FD9D38702626}.Release|x86.Build.0 = Release|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Debug|x64.Build.0 = Debug|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Debug|x86.Build.0 = Debug|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Release|x64.ActiveCfg = Release|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Release|x64.Build.0 = Release|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Release|x86.ActiveCfg = Release|Any CPU
+		{F2FE711B-FBD1-4D84-8B0E-1E60F451E480}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{73F98EC5-C52A-415D-810D-268E9D388849} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
-		{4A9E086A-996D-4817-937E-8EE53E63CE2C} = {FBF56CC3-7AE6-AD2D-3F14-7F97FD322CD6}
-		{B714660E-F98E-4266-A984-FD9D38702626} = {6EDC7094-E22D-CF10-605B-B42C7FB8B0A8}
 	EndGlobalSection
 EndGlobal

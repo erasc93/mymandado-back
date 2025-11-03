@@ -1,3 +1,4 @@
+using api_mandado.DependencyInjection;
 using models;
 
 namespace api_mymandado;
@@ -8,18 +9,17 @@ public class Program
     public static void Main(string[] args)
     {
 
-        WebApplicationBuilder 
-            builder = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder builder;
+        WebApplication app;
 
-        //builder.Services.AddScoped<WeatherForecast>();
 
-        // Add services to the container.
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        //builder.Services.AddOpenApi();
-        builder.Services.AddControllers();
+        builder = WebApplication.CreateBuilder(args);
 
-        WebApplication 
-            app = builder.Build();
+
+        DI_Services.instance.AddDependencies(builder.Services,builder.Configuration);
+
+
+        app = builder.Build();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -53,7 +53,7 @@ public class Program
         //})
         //.WithName("GetWeatherForecast");
 
-        
+
 
         app.Run();
     }
