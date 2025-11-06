@@ -1,5 +1,6 @@
 ﻿using core_mandado.models;
 using core_mandado.repositories;
+using dataaccess.Factories;
 using dataaccess.information_schema.tables;
 using dbaccess;
 using MySql.Data.MySqlClient;
@@ -10,44 +11,37 @@ namespace repositories;
 public class Repo_Products : ARepository, IRepo_Products
 {
     private Repo_DbTable<MND_PRODUCT> _repo_PRD { get; init; }
-    public Repo_Products(ICRUDQuery query, Repo_DbTable<MND_PRODUCT> repoTables) : base(query) { _repo_PRD = repoTables; }
+    private FactoryProducts _facProd { get; init; }
+    public Repo_Products(ICRUDQuery query, Repo_DbTable<MND_PRODUCT> repoTables, FactoryProducts facProducts) : base(query)
+    {
+        _repo_PRD = repoTables;
+        _facProd = facProducts;
+    }
 
     public Product[] GetAll()
     {
         Product[] output;
 
         output = (from p in _repo_PRD.GetAll()
-                  select new Product()
-                  {
-                      id = p.prd_id,
-                      name = p.prd_name,
-                      unit = p.prd_unit
-                  }).ToArray();
+                  select _facProd.ToView(p))
+                  .ToArray();
         return output;
     }
     public void Add(ref Product product)
     {
-        MND_PRODUCT p = new MND_PRODUCT()
-        {
-            prd_name = product.name,
-            prd_unit = product.unit
-        };
-        _repo_PRD.Add(ref p);
-        product.id = p.prd_id;
+        MND_PRODUCT prod;
+        prod = _facProd.FromView(product);
+        _repo_PRD.Add(ref prod);
+        product.id = prod.prd_id;
     }
 
     public Product GetById(int id)
     {
         Product output;
-        MND_PRODUCT p = _repo_PRD.GetById(id);
+        MND_PRODUCT prd;
 
-        output =
-                   new Product()
-                   {
-                       id = p.prd_id,
-                       name = p.prd_name,
-                       unit = p.prd_unit
-                   };
+        prd = _repo_PRD.GetById(id)!;
+        output = _facProd.ToView(prd);
 
         return output;
     }
@@ -58,7 +52,8 @@ public class Repo_Products : ARepository, IRepo_Products
         //string sql;
         //sql = $"select * from MND_PRODUCTS WHERE prd_name={name};";
 
-        MND_PRODUCT p = new MND_PRODUCT() { prd_id = id, prd_name = "fuck" };
+        //MND_PRODUCT p = new MND_PRODUCT() { prd_id = id, prd_name = "fuck" };
+        MND_PRODUCT p = _query.GetById<MND_PRODUCT>(id)!;
         bool success = _query.Delete(p);
 
         if (!success)
@@ -88,9 +83,5 @@ public class Repo_Products : ARepository, IRepo_Products
     private MND_PRODUCT ToMND_PRODUCT(Product p)
     {
         return new MND_PRODUCT() { prd_name = p.name, prd_id = p.id, prd_unit = p.unit };
-    }
-    private Product FromMND_PRODUCT(MND_PRODUCT p)
-    {
-        return new Product() { id = p.prd_id, name = p.prd_name, unit = p.prd_unit };
     }
 }

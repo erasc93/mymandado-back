@@ -1,5 +1,6 @@
 ﻿using core_mandado.models;
 using core_mandado.repositories;
+using dataaccess.Factories;
 using dbaccess;
 using repositories;
 using repositories.infoSchema;
@@ -29,6 +30,11 @@ public sealed class DI_Services
 
         DBConnection(services, config);
         AddRepositories(services);
+        AddFactories(services);
+    }
+    private void AddFactories(IServiceCollection services)
+    {
+        services.AddSingleton<FactoryProducts>();
     }
     private void AddRepositories(IServiceCollection services)
     {

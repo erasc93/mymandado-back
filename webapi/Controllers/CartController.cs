@@ -11,14 +11,19 @@ namespace api_mandado.Controllers;
 public class CartController : ControllerBase
 {
     private IRepo_Cart _cartitemsRepository { get; init; }
-    public CartController(IRepo_Cart cartitemsRepo)
+    private IRepo_Users _repoUser{ get; init; }
+    public CartController(
+        IRepo_Cart cartitemsRepo, IRepo_Users repoUser)
     {
         _cartitemsRepository = cartitemsRepo;
+        _repoUser = repoUser;
     }
     // GET: api/<CartItemsController>
     [HttpGet]
-    public ActionResult<CartItem[]> Get([FromBody] User user)
+    //public ActionResult<CartItem[]> Get([FromBody] User user)
+    public ActionResult<CartItem[]> Get()
     {
+        User user = _repoUser.GetCurrent();
         CartItem[] output;
         output = _cartitemsRepository.GetAll(user);
         return Ok(output);
@@ -27,16 +32,19 @@ public class CartController : ControllerBase
 
     // POST api/<CartItemsController>
     [HttpPost]
-    public ActionResult<CartItem> Post([FromBody] CartItem value)
+    public ActionResult<CartItem> Post([FromBody] CartItem value )
     {
-        _cartitemsRepository.Add(ref value);
+        //TODO: Get User from session guid
+        User user = _repoUser.GetCurrent();
+        _cartitemsRepository.Add(ref value,user);
         return value;
     }
 
     [HttpPut]
     public void Put([FromBody] CartItem value)
     {
-        _cartitemsRepository.Update(value);
+        User user = _repoUser.GetCurrent();
+        _cartitemsRepository.Update(value,user);
     }
 
     [HttpDelete("{id}")]

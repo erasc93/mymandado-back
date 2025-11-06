@@ -11,10 +11,13 @@ namespace repositories;
 
 
 
-
-
 public class Repo_Users(ICRUDQuery query) : ARepository(query), IRepo_CREATE<User>, IRepo_READ<User>, IRepo_DELETE<User>, IRepo_UPDATE<User>, IRepo_Users
 {
+    public User GetCurrent()
+    {
+        User u = new User() { id = 1, name = "manu"};
+        return u;
+    }
     public User? GetUserByName(string userName)
     {
         string query;

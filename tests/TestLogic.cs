@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
 using core_mandado.models;
+using core_mandado.repositories;
 using dataaccess.information_schema.tables;
 using information_schema.models;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,21 +22,21 @@ public class TestLogic : IClassFixture<CustomWebApplicationFactory>
     private readonly Repo_StoredProcedures _repoStoredPro;
     private readonly Repo_Tables _repoTables;
 
-    private readonly Repo_Users _repoUsers;
 
     private readonly Repo_DbTable<MND_PRODUCT> _repoDBProducts;
 
-    private readonly Repo_Cart _repoCart;
-    private readonly Repo_Products _repoProducts;
+    private readonly IRepo_Users _repoUsers;
+    private readonly IRepo_Cart _repoCart;
+    private readonly IRepo_Products _repoProducts;
     public TestLogic(CustomWebApplicationFactory factory)
     {
         IServiceScope scope;
         scope = factory.Services.CreateScope();
         using (scope)
         {
-            _repoCart = scope.ServiceProvider.GetRequiredService<Repo_Cart>();
-            _repoUsers = scope.ServiceProvider.GetRequiredService<Repo_Users>();
-            _repoProducts = scope.ServiceProvider.GetRequiredService<Repo_Products>();
+            _repoCart = scope.ServiceProvider.GetRequiredService<IRepo_Cart>();
+            _repoUsers = scope.ServiceProvider.GetRequiredService<IRepo_Users>();
+            _repoProducts = scope.ServiceProvider.GetRequiredService<IRepo_Products>();
             _repoDBProducts = scope.ServiceProvider.GetRequiredService<Repo_DbTable<MND_PRODUCT>>();
         }
     }

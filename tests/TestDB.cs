@@ -3,6 +3,7 @@
 namespace tests_mandado;
 
 using System.Threading.Tasks;
+using core_mandado.repositories;
 using information_schema.models;
 using Microsoft.Extensions.DependencyInjection;
 using repositories;
@@ -18,10 +19,10 @@ public class TestDB : IClassFixture<CustomWebApplicationFactory>
     private readonly Repo_StoredProcedures _repoStoredPro;
 
     private readonly Repo_Tables _repoTables;
-    private readonly Repo_Cart _repoCart;
-    private readonly Repo_Users _repoUsers;
+    private readonly IRepo_Cart _repoCart;
+    private readonly IRepo_Users _repoUsers;
 
-    private readonly Repo_Products _repoProducts;
+    private readonly IRepo_Products _repoProducts;
 
     public TestDB(CustomWebApplicationFactory factory)
     {
@@ -32,9 +33,9 @@ public class TestDB : IClassFixture<CustomWebApplicationFactory>
             _repoStoredPro = scope.ServiceProvider.GetRequiredService<Repo_StoredProcedures>();
             _repoTables = scope.ServiceProvider.GetRequiredService<Repo_Tables>();
 
-            _repoCart = scope.ServiceProvider.GetRequiredService<Repo_Cart>();
-            _repoUsers = scope.ServiceProvider.GetRequiredService<Repo_Users>();
-            _repoProducts = scope.ServiceProvider.GetRequiredService<Repo_Products>();
+            _repoCart = scope.ServiceProvider.GetRequiredService<IRepo_Cart>();
+            _repoUsers = scope.ServiceProvider.GetRequiredService<IRepo_Users>();
+            _repoProducts = scope.ServiceProvider.GetRequiredService<IRepo_Products>();
         }
     }
 

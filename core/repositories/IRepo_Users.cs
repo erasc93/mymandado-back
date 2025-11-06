@@ -4,6 +4,7 @@ namespace core_mandado.repositories;
 
 public interface IRepo_Users
 {
+    User GetCurrent();
 
     User? GetUserByName(string userName);
     User[] GetAll();

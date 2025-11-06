@@ -6,6 +6,7 @@ namespace api_mymandado;
 
 public class Program
 {
+    private const string CORS_NAME= "AllowAll";
     public static void Main(string[] args)
     {
 
@@ -16,7 +17,19 @@ public class Program
         builder = WebApplication.CreateBuilder(args);
 
 
-        DI_Services.instance.AddDependencies(builder.Services,builder.Configuration);
+
+        DI_Services.instance.AddDependencies(builder.Services, builder.Configuration);
+
+        builder.Services.AddCors((options) =>
+        {
+            options.AddPolicy(CORS_NAME,
+                (builder) =>
+                {
+                    builder.AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowAnyOrigin();
+                });
+        });
 
 
         app = builder.Build();
@@ -28,7 +41,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-        //app.UseCors();//
+        app.UseCors(CORS_NAME);//
         app.UseAuthorization();
         //app.UseAuthentication();//
         app.MapControllers();
