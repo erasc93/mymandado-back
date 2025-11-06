@@ -1,5 +1,6 @@
 ﻿using core_mandado.models;
 using core_mandado.repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using repositories;
@@ -13,12 +14,20 @@ namespace api_mandado.Controllers;
 public class ProductsController : ControllerBase
 {
     private IRepo_Products _productsRepository { get; init; }
-    public ProductsController(IRepo_Products productsRepo)
+    private string? username { get; init; }
+private UserContextService _svc_context { get; init; }
+    public ProductsController(
+        IRepo_Products productsRepo,
+        UserContextService svc_context
+        )
     {
+        _svc_context = svc_context;
         _productsRepository = productsRepo;
+        username = _svc_context.GetUsername();
     }
     // GET: api/<ProductsController>
     [HttpGet]
+    [Authorize]
     public ActionResult<Product[]> Get()
     {
         Product[] output;
@@ -56,4 +65,20 @@ public class ProductsController : ControllerBase
     }
 
 
+}
+
+public class UserContextService
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public UserContextService(IHttpContextAccessor accessor)
+    {
+        _httpContextAccessor = accessor;
+    }
+
+    public string? GetUsername()
+    {
+        return _httpContextAccessor.HttpContext?.User?.Claims
+            ?.FirstOrDefault(c => c.Type == "username")?.Value;
+    }
 }

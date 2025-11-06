@@ -1,4 +1,4 @@
-﻿namespace ALTEN_CORE_LOGIC.Authentication;
+﻿namespace core_mandado.authentication;
 
 public interface IJwtTokenGenerator
 {

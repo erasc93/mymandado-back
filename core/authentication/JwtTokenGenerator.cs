@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 
-namespace ALTEN_CORE_LOGIC.Authentication;
+namespace core_mandado.authentication;
 
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
@@ -21,7 +21,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         Claim[] claims;
         claims = [
                     new Claim(type:"username", value:username),
-                        new Claim(type:"isAdmin", value:isAdmin.ToString().ToLower()),
+                    //new Claim(type:"isAdmin", value:isAdmin.ToString().ToLower()),
                  ];
 
         JwtSecurityToken
@@ -53,45 +53,4 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
     }
 
-    public class AppUserInfo
-    {
-        public string name { get; set; }
-        public string guid { get; set; }
-        public string token { get; set; }
-    }
-
-
-    //public AppUserInfo GenerateJWTAppUserInfo(string login)
-    //{
-    //    AppUserInfo output;
-    //    Guid guid;
-    //    string token;
-    //    List<Claim> claims;
-    //    JwtSecurityToken jwtSecurityToken;
-
-    //    SigningCredentials signingCreds;
-    //    JwtSecurityTokenHandler myTokenHandler;
-
-    //    guid = Guid.NewGuid();
-
-    //    claims = BuildClaims(login, guid);
-
-    //    signingCreds = BuildSigningCredentials();
-    //    jwtSecurityToken = new JwtSecurityToken(
-    //                                        claims: claims,
-    //                                        notBefore: DateTime.UtcNow,
-    //                                        expires: DateTime.UtcNow.AddMinutes(30),
-    //                                        signingCredentials: signingCreds
-    //                                    );
-
-    //    myTokenHandler = new JwtSecurityTokenHandler();
-    //    token = myTokenHandler.WriteToken(jwtSecurityToken);
-    //    output = new AppUserInfo()
-    //    {
-    //        name = login,
-    //        guid = guid.ToString(),
-    //        token = token
-    //    };
-    //    return output;
-    //}
 }

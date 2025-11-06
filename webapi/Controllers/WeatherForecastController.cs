@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using core_mandado.models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using models;
 
 namespace api_mandado.Controllers
 {
