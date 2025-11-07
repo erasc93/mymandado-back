@@ -1,9 +1,7 @@
-﻿using core_mandado.models;
-using core_mandado.repositories;
+﻿using api_mandado.services;
+using core_mandado.Products;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using repositories;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,7 +13,7 @@ public class ProductsController : ControllerBase
 {
     private IRepo_Products _productsRepository { get; init; }
     private string? username { get; init; }
-private UserContextService _svc_context { get; init; }
+    private UserContextService _svc_context { get; init; }
     public ProductsController(
         IRepo_Products productsRepo,
         UserContextService svc_context
@@ -32,14 +30,15 @@ private UserContextService _svc_context { get; init; }
     {
         Product[] output;
         output = _productsRepository.GetAll();
-        return Ok(output);
+        return output;
     }
 
     // GET api/<ProductsController>/5
     [HttpGet("{id}")]
     public Product Get(int id)
     {
-        Product output = _productsRepository.GetById(id);
+        Product output;
+        output = _productsRepository.GetById(id);
         return output;
     }
 
@@ -48,7 +47,7 @@ private UserContextService _svc_context { get; init; }
     public ActionResult<Product> Post([FromBody] Product value)
     {
         _productsRepository.Add(ref value);
-        return value;
+        return CreatedAtAction(nameof(Get),new {id=value.id},value);
     }
 
     [HttpPut]
@@ -65,20 +64,4 @@ private UserContextService _svc_context { get; init; }
     }
 
 
-}
-
-public class UserContextService
-{
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public UserContextService(IHttpContextAccessor accessor)
-    {
-        _httpContextAccessor = accessor;
-    }
-
-    public string? GetUsername()
-    {
-        return _httpContextAccessor.HttpContext?.User?.Claims
-            ?.FirstOrDefault(c => c.Type == "username")?.Value;
-    }
 }

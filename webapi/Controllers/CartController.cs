@@ -1,5 +1,6 @@
-﻿using core_mandado.models;
-using core_mandado.repositories;
+﻿using api_mandado.services;
+using core_mandado.Cart;
+using core_mandado.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +28,6 @@ public class CartController : ControllerBase
     }
     // GET: api/<CartItemsController>
     [HttpGet]
-    //public ActionResult<CartItem[]> Get([FromBody] User user)
     [Authorize]
     public ActionResult<CartItem[]> Get()
     {

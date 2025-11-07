@@ -2,7 +2,7 @@
 
 namespace tests_mandado.utilities;
 
-using api_mandado.DependencyInjection;
+using api_mandado.services;
 using api_mymandado;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -17,10 +17,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.ConfigureAppConfiguration(ConfigureContext);
         //builder.ConfigureServices(DI_Services.instance.AddDependencies);
-        builder.ConfigureServices(f);
+        builder.ConfigureServices(SetupDependencyInjectionServices);
     }
 
-    private void f(WebHostBuilderContext context, IServiceCollection collection)
+    private void SetupDependencyInjectionServices(WebHostBuilderContext context, IServiceCollection collection)
     {
         //context.Configuration
         DI_Services.instance.AddDependencies(collection, context.Configuration);

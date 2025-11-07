@@ -2,13 +2,8 @@
 
 using System.Net;
 using System.Threading.Tasks;
-using api_mandado.Controllers;
 using api_mymandado;
-using core_mandado.models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
-using models;
-using repositories;
 using Xunit;
 
 public class TestWeatherForecast : IClassFixture<WebApplicationFactory<Program>>

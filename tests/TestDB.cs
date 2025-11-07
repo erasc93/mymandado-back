@@ -3,11 +3,12 @@
 namespace tests_mandado;
 
 using System.Threading.Tasks;
-using core_mandado.repositories;
-using information_schema.models;
+using core_mandado.Cart;
+using core_mandado.Products;
+using core_mandado.Users;
 using Microsoft.Extensions.DependencyInjection;
-using repositories;
-using repositories.infoSchema;
+using models.information_schema;
+using Services.Repositories;
 using tests_mandado.utilities;
 using Xunit;
 
@@ -18,7 +19,7 @@ public class TestDB : IClassFixture<CustomWebApplicationFactory>
 
     private readonly Repo_StoredProcedures _repoStoredPro;
 
-    private readonly Repo_Tables _repoTables;
+    private readonly Repo_TableInfos _repoTables;
     private readonly IRepo_Cart _repoCart;
     private readonly IRepo_Users _repoUsers;
 
@@ -31,7 +32,7 @@ public class TestDB : IClassFixture<CustomWebApplicationFactory>
         using (var scope = factory.Services.CreateScope())
         {
             _repoStoredPro = scope.ServiceProvider.GetRequiredService<Repo_StoredProcedures>();
-            _repoTables = scope.ServiceProvider.GetRequiredService<Repo_Tables>();
+            _repoTables = scope.ServiceProvider.GetRequiredService<Repo_TableInfos>();
 
             _repoCart = scope.ServiceProvider.GetRequiredService<IRepo_Cart>();
             _repoUsers = scope.ServiceProvider.GetRequiredService<IRepo_Users>();
