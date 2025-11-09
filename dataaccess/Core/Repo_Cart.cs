@@ -56,7 +56,7 @@ public class Repo_Cart : ARepository,
         mnd_cart_item = new MND_CART_ITEM()
         {
             crt_itid = item.id,
-            crt_userid = user.id,
+            crt_usrid = user.id,
             crt_prdid = item.product.id,
             crt_isdone = item.isdone,
             crt_qtty = item.quantity
@@ -73,7 +73,7 @@ public class Repo_Cart : ARepository,
 
         CartItem[] carts = (
                         from item in crts
-                        where item.crt_userid == user.id
+                        where item.crt_usrid == user.id
                         select new CartItem()
                         {
                             id = item.crt_itid,
@@ -114,7 +114,7 @@ public class Repo_Cart : ARepository,
                 crt_itid = id,
                 crt_qtty = APP_PARAMS.instance.UNDEFINED,
                 crt_prdid = APP_PARAMS.instance.UNDEFINED,
-                crt_userid = APP_PARAMS.instance.UNDEFINED,
+                crt_usrid = APP_PARAMS.instance.UNDEFINED,
                 crt_isdone = false
             });
         if (!success)
@@ -133,7 +133,7 @@ public class Repo_Cart : ARepository,
             crt_itid = APP_PARAMS.instance.UNDEFINED,
             crt_qtty = item.quantity,
             //crt_userid = item.user.id,
-            crt_userid = user.id,
+            crt_usrid = user.id,
             crt_prdid = item.product.id,
             crt_isdone = item.isdone
         };

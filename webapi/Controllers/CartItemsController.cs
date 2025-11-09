@@ -10,13 +10,13 @@ namespace api_mandado.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CartController : ControllerBase
+public class CartItemsController : ControllerBase
 {
     private IRepo_Cart _cartitemsRepository { get; init; }
     private IRepo_Users _repoUser { get; init; }
     private UserContextService _svc_context { get; set; }
     private string _username { get; set; }
-    public CartController(
+    public CartItemsController(
         IRepo_Cart cartitemsRepo, IRepo_Users repoUser,
         UserContextService svc_context
         )

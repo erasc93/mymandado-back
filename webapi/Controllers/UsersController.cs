@@ -20,6 +20,24 @@ namespace api_mandado.Controllers
             _authManager = jwtTokenGenerator;
         }
 
+        /// <summary>
+        /// permet de se connecter à l'application
+        /// </summary>
+        /// <param name="loginInfo">{ username :string,  password :string }</param>
+        /// <returns>jwt token string </returns>
+        [HttpPost("login")]
+        public ObjectResult Login([FromBody] LoginInfo loginInfo)
+        {
+            TokenType token;
+            string tokenstr;
+            Claim[] claims;
+
+            claims = UserClaimInfo(loginInfo);
+            tokenstr = _authManager.GenerateJwtTokenAsString(claims);
+            token = new TokenType(tokenstr);
+
+            return Ok(token);
+        }
 
         /// <summary>
         /// User creation
@@ -39,24 +57,6 @@ namespace api_mandado.Controllers
             }
         }
 
-        /// <summary>
-        /// permet de se connecter à l'application
-        /// </summary>
-        /// <param name="loginInfo">{ username :string,  password :string }</param>
-        /// <returns>jwt token string </returns>
-        [HttpPost("login")]
-        public ObjectResult Login([FromBody] LoginInfo loginInfo)
-        {
-            TokenType token;
-            string tokenstr;
-            Claim[] claims;
-
-            claims = UserClaimInfo(loginInfo);
-            tokenstr = _authManager.GenerateJwtTokenAsString(claims);
-            token = new TokenType(tokenstr);
-
-            return Ok(token);
-        }
         // --- --- --- 
         private Claim[] UserClaimInfo(LoginInfo loginInfo)
         {

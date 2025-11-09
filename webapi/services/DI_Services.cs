@@ -35,6 +35,7 @@ public sealed class DI_Services
     public void AddDependencies(IServiceCollection services, IConfiguration config)
     {
         services.AddControllers();
+        services.AddOpenApi();
 
         DBConnection(services, config);
         AddRepositories(services);
