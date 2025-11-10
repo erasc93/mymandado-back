@@ -1,13 +1,13 @@
 ﻿using core_mandado.Users;
 using models.tables;
-using Services.Dapper.Queries;
+using Services.Dapper.Interfaces;
 using Services.Repositories.Abstractions;
 using Services.Repositories.Interfaces;
 using System.Data;
 
 namespace core;
 
-public class Repo_Users(ITransactionQueries query) : ARepository(query),
+public class Repo_Users(IQueries query) : ARepository(query),
                                             IRepo_Users,
                                             IRepo_CREATE<User>, IRepo_READ<User>, IRepo_DELETE<User>, IRepo_UPDATE<User>
 {

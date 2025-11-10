@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Services.Dapper;
+using Services.Dapper.Interfaces;
 using Services.Dapper.Queries;
 using Services.Factories;
 using Services.Repositories;
@@ -124,27 +125,15 @@ public sealed class DI_Services
         }
         services.AddSingleton<IConnectionInformation_DB>(new ConnectionInformation_DB(connectionString));
 
-        //services.AddScoped<IQueries, Queries>();
-        //services.AddScoped<IQueries, Queries>();
+        services.AddScoped<IQueries, Queries>();
 
-        //services.AddScoped<ICRUD, CRUD>();
-        //services.AddScoped<IBulk, BulkCRUD>();
+        services.AddScoped<ICRUD, CRUD>();
+        services.AddScoped<IBulk, BulkCRUD>();
         services.AddScoped<IFreeQuery, FreeQuery>();
 
-        //services.AddScoped<ICRUDAsync, CRUDAsync>();
-        //services.AddScoped<IBulkAsync, BulkAsync>();
+        services.AddScoped<ICRUDAsync, CRUDAsync>();
+        services.AddScoped<IBulkAsync, BulkAsync>();
         services.AddScoped<IFreeQueryAsync, FreeQueryAsync>();
-
-
-        services.AddScoped<ITransactionQueries, TransactionQueries>();
-
-        services.AddScoped<ITransacCRUD, TransacCRUD>();
-        services.AddScoped<ITransacBulk, TransacBulkCRUD>();
-        services.AddScoped<ITransacFreeQuery, TransacFreeQuery>();
-
-        services.AddScoped<ITransacCRUDAsync, TransacCRUDAsync>();
-        services.AddScoped<ITransacBulkAsync, TransacBulkAsync>();
-        services.AddScoped<ITransacFreeQueryAsync, TransacFreeQueryAsync>();
 
         services.AddScoped<Repo_StoredProcedures>();
         services.AddScoped<Repo_TableInfos>();

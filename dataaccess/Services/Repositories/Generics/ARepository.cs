@@ -1,11 +1,11 @@
-﻿using Services.Dapper.Queries;
+﻿using Services.Dapper.Interfaces;
 
 namespace Services.Repositories.Abstractions;
 
 public abstract class ARepository
 {
-    protected ITransactionQueries _query { get; private set; }
-    public ARepository(ITransactionQueries query)
+    protected IQueries _query { get; private set; }
+    public ARepository(IQueries query)
     {
         _query = query;
     }

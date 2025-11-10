@@ -1,11 +1,11 @@
 ﻿using models.tables;
-using Services.Dapper.Queries;
+using Services.Dapper.Interfaces;
 using Services.Repositories.Abstractions;
 using System.Data;
 
 namespace Services.Repositories;
 
-public class Repo_AnyTable<T>(ITransactionQueries query) : ARepository(query) where T : class, IDbTable
+public class Repo_AnyTable<T>(IQueries query) : ARepository(query) where T : class, IDbTable
 {
     public T? GetById(int id, IDbTransaction? transaction = null)
     {

@@ -1,13 +1,13 @@
 ﻿using models.information_schema;
 using Mysqlx.Crud;
-using Services.Dapper.Queries;
+using Services.Dapper.Interfaces;
 
 namespace Services.Repositories;
 
 public class Repo_StoredProcedures
 {
-    private ITransactionQueries _query { get; init; }
-    public Repo_StoredProcedures(ITransactionQueries freeQuery)
+    private IQueries _query { get; init; }
+    public Repo_StoredProcedures(IQueries freeQuery)
     {
         _query = freeQuery;
     }

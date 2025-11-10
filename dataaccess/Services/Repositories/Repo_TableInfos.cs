@@ -1,11 +1,11 @@
 ﻿using models.information_schema;
-using Services.Dapper.Queries;
+using Services.Dapper.Interfaces;
 
 namespace Services.Repositories;
 public class Repo_TableInfos
 {
-    private ITransactionQueries _query { get; init; }
-    public Repo_TableInfos(ITransactionQueries queries)
+    private IQueries _query { get; init; }
+    public Repo_TableInfos(IQueries queries)
     {
         _query = queries;
     }
