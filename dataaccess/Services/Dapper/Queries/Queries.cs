@@ -30,22 +30,20 @@ public class Queries : IQueries
     public void ExecuteInTransaction(Action<IDbConnection, IDbTransaction> action)
     {
 
-        IDbConnection conn;
 
-        using (conn = new MySqlConnection(_credentialDatabase.ConnectionString))
+        using IDbConnection conn = new MySqlConnection(_credentialDatabase.ConnectionString);
+        conn.Open();
+        using IDbTransaction transaction = conn.BeginTransaction();
+
+        try
         {
-            using var transaction = conn.BeginTransaction();
-
-            try
-            {
-                action(conn, transaction);
-                transaction.Commit();
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-            }
+            action(conn, transaction);
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
         }
     }
 }

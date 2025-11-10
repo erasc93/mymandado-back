@@ -12,12 +12,12 @@ namespace api_mandado.Controllers;
 [ApiController]
 public class CartItemsController : ControllerBase
 {
-    private IRepo_Cart _cartitemsRepository { get; init; }
+    private IRepo_CartItems _cartitemsRepository { get; init; }
     private IRepo_Users _repoUser { get; init; }
     private ClaimsAccessor _svc_context { get; set; }
     private string _username { get; set; }
     public CartItemsController(
-        IRepo_Cart cartitemsRepo, IRepo_Users repoUser,
+        IRepo_CartItems cartitemsRepo, IRepo_Users repoUser,
         ClaimsAccessor svc_context
         )
     {
@@ -40,19 +40,19 @@ public class CartItemsController : ControllerBase
 
     // POST api/<CartItemsController>
     [HttpPost]
-    public ActionResult<CartItem> Post([FromBody] CartItem value)
+    public ActionResult<CartItem> Post(int cartNumber, CartItem value)
     {
         //TODO: Get User from session guid
         User user = _repoUser.GetCurrent();
-        _cartitemsRepository.Add(ref value, user);
+        _cartitemsRepository.Add(cartNumber, ref value, user);
         return value;
     }
 
     [HttpPut]
-    public void Put([FromBody] CartItem value)
+    public void Put(int cartNumber, CartItem value)
     {
         User user = _repoUser.GetCurrent();
-        _cartitemsRepository.Update(value, user);
+        _cartitemsRepository.Update(cartNumber, value, user);
     }
 
     [HttpDelete("{id}")]

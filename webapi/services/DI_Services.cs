@@ -112,6 +112,7 @@ public sealed class DI_Services
         services.AddScoped<IRepo_Products, Repo_Products>();
         services.AddScoped<IRepo_Users, Repo_Users>();
         services.AddScoped<IRepo_Cart, Repo_Cart>();
+        services.AddScoped<IRepo_CartItems, Repo_CartItems>();
         services.AddScoped<IRepo_Users, Repo_Users>();
         //services.AddScoped(typeof(IProductsRepository<Product>),typeof(RepoProducts));
     }

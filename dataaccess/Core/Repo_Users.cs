@@ -19,7 +19,7 @@ public class Repo_Users(IQueries query) : ARepository(query),
     public User GetCurrent()
     {
         User
-            u = new User() { id = 1, name = "manu" };
+            u = new User() { id = 1, name = "manu", role = User.Role.admin };
         return u;
     }
     public User? GetUserByName(string userName)
@@ -32,7 +32,7 @@ public class Repo_Users(IQueries query) : ARepository(query),
                         {"@username",userName},
                     };
         query = $"select * from USERS where usr_name=@username";
-        MND_USERS[] mndusers = _query.free.Query<MND_USERS>(query,param).ToArray();
+        MND_USERS[] mndusers = _query.free.Query<MND_USERS>(query, param).ToArray();
 
         User? output;
         output = (from u in mndusers
@@ -40,6 +40,7 @@ public class Repo_Users(IQueries query) : ARepository(query),
                   {
                       id = u.usr_id,
                       name = u.usr_name,
+                      role = u.usr_role,
                   }
                   ).FirstOrDefault();
 
@@ -52,22 +53,68 @@ public class Repo_Users(IQueries query) : ARepository(query),
 
         User[] output;
         output = (from u in mndusers
-                  select new User() { id = u.usr_id, name = u.usr_name }
+                  select new User() { id = u.usr_id, name = u.usr_name, role = u.usr_role }
                   ).ToArray();
 
         return output;
     }
-
-    public User AddByName(string userName)
+    public User? AddByName(string userName)
     {
         MND_USERS mnduser;
-        mnduser = new MND_USERS() { usr_name = userName };
-        int? o = _query.crud.Add(mnduser);
+        MND_CART firstCart;
+        int? userid = null;
+        User? output = null;
+
+        mnduser = new MND_USERS
+        {
+            usr_name = userName,
+            usr_role = User.Role.friend
+        };
+
+
+
+        _query.ExecuteInTransaction((c, t) =>
+        {
+            userid = _query.crud.Add<MND_USERS>(mnduser, c, t)!;
+            firstCart = new MND_CART
+            {
+                car_crtnb = 0,
+                car_desc = "",
+                car_name = "cart",
+                car_usrid = (int)userid
+            };
+            firstCart.car_usrid = (int)_query.crud.Add<MND_CART>(firstCart,c,t)!;
+            output = new User()
+            {
+                id = (int)userid!,
+                name = mnduser.usr_name,
+                role = mnduser.usr_role
+            };
+        });
+
+
+        return output;
+    }
+    public User AddByNameSafe(string userName)
+    {
+        MND_USERS mnduser;
+        int? userid;
         User output;
+
+        mnduser = new MND_USERS
+        {
+            usr_name = userName,
+            usr_role = User.Role.friend
+        };
+
+
+        userid = _query.crud.Add(mnduser);
+
         output = new User()
         {
-            id = (int)o,
-            name = mnduser.usr_name
+            id = (int)userid!,
+            name = mnduser.usr_name,
+            role = mnduser.usr_role
         };
         return output;
     }
@@ -79,13 +126,13 @@ public class Repo_Users(IQueries query) : ARepository(query),
     public bool Delete(User user)
     {
         bool success;
-
         MND_USERS mnduser;
 
         mnduser = new MND_USERS()
         {
             usr_id = user.id,
-            usr_name = user.name
+            usr_name = user.name,
+            usr_role = user.role,
         };
 
         success = _query.crud.Delete(mnduser);
@@ -96,6 +143,7 @@ public class Repo_Users(IQueries query) : ARepository(query),
             msg = $"Suppression de l'utilisateur {user.name} impossible";
             throw new Exception(msg);
         }
+
         return success;
     }
     public void Update(User updated)
@@ -103,17 +151,17 @@ public class Repo_Users(IQueries query) : ARepository(query),
         bool success;
 
         MND_USERS mnduser;
-
         mnduser = new MND_USERS()
         {
             usr_id = updated.id,
-            usr_name = updated.name
+            usr_name = updated.name,
+            usr_role = updated.role,
         };
         success = _query.crud.Update(mnduser);
 
         if (!success)
         {
-            string msg;
+            string
             msg = $"Mise à jour impossible de l'utilisateur {updated.name} impossible";
             throw new Exception(msg);
         }

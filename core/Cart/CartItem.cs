@@ -4,6 +4,7 @@ namespace core_mandado.Cart;
 
 public class CartItem
 {
+
     public required int id { get; set; }
     //public required User user { get; set; }
     public required Product product { get; set; }

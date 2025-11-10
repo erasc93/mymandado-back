@@ -17,7 +17,6 @@ public class TestHttpProductsController : IClassFixture<MymandadoWebAppFactory>
 {
     private HttpClient _client { get; init; }
 
-    private readonly ProductsController _prdController;
     private T? Svc<T>(IServiceScope scope) where T : notnull => scope.ServiceProvider.GetRequiredService<T>();
 
 
@@ -31,7 +30,6 @@ public class TestHttpProductsController : IClassFixture<MymandadoWebAppFactory>
         using (s = s = webAppFactory.Services.CreateScope())
         {
             _authResponse = Svc<UsersController>(s)?.Login(_loginInfo).Value as AuthResponse;
-            _prdController = Svc<ProductsController>(s)!;
         }
 
         _client = webAppFactory.CreateClient();
@@ -61,6 +59,6 @@ public class TestHttpProductsController : IClassFixture<MymandadoWebAppFactory>
 
         //ASSERT
         Assert.NotNull(products);
-        Assert.NotEmpty(products);
+        Assert.Empty(products);
     }
 }

@@ -29,7 +29,6 @@ public class CRUD : ICRUD
     }
     public bool Update<T>(T entityToUpdate, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
     {
-
         bool
             useOwnConnection = conn is null,
             success;

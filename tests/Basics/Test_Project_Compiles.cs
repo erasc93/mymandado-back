@@ -1,4 +1,4 @@
-﻿namespace tests_mandado;
+﻿namespace tests_mandado.Basics;
 
 using System.Net;
 using System.Threading.Tasks;

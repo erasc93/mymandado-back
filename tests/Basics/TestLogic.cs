@@ -1,6 +1,6 @@
 ﻿//https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/test-min-api?view=aspnetcore-9.0
 
-namespace tests_mandado;
+namespace tests_mandado.Basics;
 
 using System.Data;
 using core_mandado.Cart;
@@ -23,7 +23,7 @@ public class TestLogic : IClassFixture<MymandadoWebAppFactory>
     private readonly Repo_AnyTable<MND_PRODUCT> _repoDBProducts;
 
     private readonly IRepo_Users _repoUsers;
-    private readonly IRepo_Cart _repoCart;
+    private readonly IRepo_CartItems _repoCart;
     private readonly IRepo_Products _repoProducts;
     public TestLogic(MymandadoWebAppFactory factory) 
     {
@@ -31,7 +31,7 @@ public class TestLogic : IClassFixture<MymandadoWebAppFactory>
         scope = factory.Services.CreateScope();
         using (scope)
         {
-            _repoCart = scope.ServiceProvider.GetRequiredService<IRepo_Cart>();
+            _repoCart = scope.ServiceProvider.GetRequiredService<IRepo_CartItems>();
             _repoUsers = scope.ServiceProvider.GetRequiredService<IRepo_Users>();
             _repoProducts = scope.ServiceProvider.GetRequiredService<IRepo_Products>();
             _repoDBProducts = scope.ServiceProvider.GetRequiredService<Repo_AnyTable<MND_PRODUCT>>();
