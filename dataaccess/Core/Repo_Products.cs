@@ -12,7 +12,7 @@ public class Repo_Products : ARepository,
 {
     private Repo_AnyTable<MND_PRODUCT> _repo_PRD { get; init; }
     private FactoryProducts _facProd { get; init; }
-    public Repo_Products(IQueries query, Repo_AnyTable<MND_PRODUCT> repoTables, FactoryProducts facProducts) : base(query)
+    public Repo_Products(ITransactionQueries query, Repo_AnyTable<MND_PRODUCT> repoTables, FactoryProducts facProducts) : base(query)
     {
         _repo_PRD = repoTables;
         _facProd = facProducts;

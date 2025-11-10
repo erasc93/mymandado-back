@@ -6,94 +6,28 @@ using System.Data;
 using Z.Dapper.Plus;
 
 namespace Services.Dapper.Queries;
-public class Queries : IQueries
-{
-    public Queries(IFreeQuery free, ICRUD crud, IBulk bulk, IFreeQueryAsync freeAsync, ICRUDAsync crudAsync, IBulkAsync bulkAsync)
-    {
-        this.free = free;
-        this.crud = crud;
-        this.bulk = bulk;
-        this.freeAsync = freeAsync;
-        this.crudAsync = crudAsync;
-        this.bulkAsync = bulkAsync;
-    }
+//public class Queries : IQueries
+//{
+//    public Queries(IFreeQuery free, ICRUD crud, IBulk bulk, IFreeQueryAsync freeAsync, ICRUDAsync crudAsync, IBulkAsync bulkAsync)
+//    {
+//        this.free = free;
+//        this.crud = crud;
+//        this.bulk = bulk;
+//        this.freeAsync = freeAsync;
+//        this.crudAsync = crudAsync;
+//        this.bulkAsync = bulkAsync;
+//    }
 
-    public IFreeQuery free { get; private set; }
-    public ICRUD crud { get; private set; }
-    public IBulk bulk { get; private set; }
+//    public IFreeQuery free { get; private set; }
+//    public ICRUD crud { get; private set; }
+//    public IBulk bulk { get; private set; }
 
-    public IFreeQueryAsync freeAsync { get; private set; }
-    public ICRUDAsync crudAsync { get; private set; }
-    public IBulkAsync bulkAsync { get; private set; }
+//    public IFreeQueryAsync freeAsync { get; private set; }
+//    public ICRUDAsync crudAsync { get; private set; }
+//    public IBulkAsync bulkAsync { get; private set; }
 
-}
+//}
 
-public class BulkCRUD : IBulk
-{
-    private IConnectionInformation_DB _credentialDatabase;
-
-    public BulkCRUD(IConnectionInformation_DB credentialDatabase)
-    {
-        _credentialDatabase = credentialDatabase;
-    }
-
-    public IEnumerable<T> GetAll<T>(IDbTransaction? transaction = null) where T : class
-    {
-        MySqlConnection connection;
-        IEnumerable<T> output;
-        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
-        {
-            output = connection.GetAll<T>(transaction);
-        }
-        return output;
-
-    }
-
-    public void BulkInsert<T>(IEnumerable<T> entitiesToInsert) where T : class
-    {
-        MySqlConnection connection;
-        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
-
-        {
-            connection.BulkInsert(entitiesToInsert);
-        }
-    }
-    public void BulkSynchronize<T>(IEnumerable<T> entitiesToInsert) where T : class
-    {
-        MySqlConnection connection;
-        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
-        {
-            connection.BulkSynchronize(entitiesToInsert);
-        }
-    }
-    public void BulkUpdate<T>(IEnumerable<T> entitiesToInsert) where T : class
-    {
-        MySqlConnection connection;
-        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
-        {
-            connection.BulkUpdate(entitiesToInsert);
-        }
-    }
-
-
-    public void BulkDelete<T>(IEnumerable<T> entitiesToMerge) where T : class
-    {
-        MySqlConnection connection;
-        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
-        {
-            connection.BulkDelete(entitiesToMerge);
-        }
-    }
-    public void BulkMerge<T>(IEnumerable<T> entitiesToMerge) where T : class
-    {
-        IDbConnection
-            connection;
-        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
-        {
-            connection.BulkMerge(entitiesToMerge);
-        }
-    }
-}
 public class CRUD : ICRUD
 {
     private IConnectionInformation_DB _credentialDatabase;
@@ -181,28 +115,72 @@ public class FreeQuery : IFreeQuery
         }
     }
 
-    public void ExecuteInTransaction(Action<IDbConnection, IDbTransaction> action)
+
+}
+public class BulkCRUD : IBulk
+{
+    private IConnectionInformation_DB _credentialDatabase;
+
+    public BulkCRUD(IConnectionInformation_DB credentialDatabase)
     {
-        using var connection = new MySqlConnection(_credentialDatabase.ConnectionString);
-        connection.Open();
+        _credentialDatabase = credentialDatabase;
+    }
 
-        using var transaction = connection.BeginTransaction();
-
-        try
+    public IEnumerable<T> GetAll<T>(IDbTransaction? transaction = null) where T : class
+    {
+        MySqlConnection connection;
+        IEnumerable<T> output;
+        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
         {
-            action(connection, transaction);
-            transaction.Commit();
+            output = connection.GetAll<T>(transaction);
         }
-        catch
+        return output;
+
+    }
+
+    public void BulkInsert<T>(IEnumerable<T> entitiesToInsert) where T : class
+    {
+        MySqlConnection connection;
+        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
+
         {
-            transaction.Rollback();
-            throw;
+            connection.BulkInsert(entitiesToInsert);
+        }
+    }
+    public void BulkSynchronize<T>(IEnumerable<T> entitiesToInsert) where T : class
+    {
+        MySqlConnection connection;
+        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
+        {
+            connection.BulkSynchronize(entitiesToInsert);
+        }
+    }
+    public void BulkUpdate<T>(IEnumerable<T> entitiesToInsert) where T : class
+    {
+        MySqlConnection connection;
+        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
+        {
+            connection.BulkUpdate(entitiesToInsert);
+        }
+    }
+
+
+    public void BulkDelete<T>(IEnumerable<T> entitiesToMerge) where T : class
+    {
+        MySqlConnection connection;
+        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
+        {
+            connection.BulkDelete(entitiesToMerge);
+        }
+    }
+    public void BulkMerge<T>(IEnumerable<T> entitiesToMerge) where T : class
+    {
+        IDbConnection
+            connection;
+        using (connection = new MySqlConnection(_credentialDatabase.ConnectionString))
+        {
+            connection.BulkMerge(entitiesToMerge);
         }
     }
 }
-
-
-
-
-
 

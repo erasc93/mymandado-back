@@ -19,7 +19,7 @@ public class Repo_Cart : ARepository,
     //private Repo_DbTable<MND_PRODUCT> _repo_PRD { get; init; }
     private IRepo_Products _repoProducts { get; init; }
     private Repo_AnyTable<MND_USERS> _repo_USR { get; init; }
-    public Repo_Cart(IQueries query,
+    public Repo_Cart(ITransactionQueries query,
             IRepo_Products repoProducts,
             Repo_AnyTable<MND_CART_ITEM> repoCartItems,
             Repo_AnyTable<MND_USERS> repoUsers,

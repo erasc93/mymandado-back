@@ -7,7 +7,7 @@ using System.Data;
 
 namespace core;
 
-public class Repo_Users(IQueries query) : ARepository(query),
+public class Repo_Users(ITransactionQueries query) : ARepository(query),
                                             IRepo_Users,
                                             IRepo_CREATE<User>, IRepo_READ<User>, IRepo_DELETE<User>, IRepo_UPDATE<User>
 {

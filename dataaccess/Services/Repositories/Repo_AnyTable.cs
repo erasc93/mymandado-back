@@ -5,7 +5,7 @@ using System.Data;
 
 namespace Services.Repositories;
 
-public class Repo_AnyTable<T>(IQueries query) : ARepository(query) where T : class, IDbTable
+public class Repo_AnyTable<T>(ITransactionQueries query) : ARepository(query) where T : class, IDbTable
 {
     public T? GetById(int id, IDbTransaction? transaction = null)
     {
@@ -18,16 +18,16 @@ public class Repo_AnyTable<T>(IQueries query) : ARepository(query) where T : cla
         return output;
     }
 
-    public void Add(ref T item, IDbTransaction? transaction = null)
+    public void Add(ref T item, IDbConnection? conn=null,IDbTransaction? transaction = null)
     {
-        int? o = _query.crud.Add(item, transaction);
+        int? o = _query.crud.Add(item, conn,transaction);
     }
 
-    public bool Delete(T item, IDbTransaction? transaction = null)
+    public bool Delete(T item, IDbConnection? conn=null, IDbTransaction? transaction = null)
     {
         bool success;
 
-        success = _query.crud.Delete(item, transaction);
+        success = _query.crud.Delete(item, conn,transaction);
 
         if (!success)
         {
@@ -37,10 +37,10 @@ public class Repo_AnyTable<T>(IQueries query) : ARepository(query) where T : cla
         }
         return success;
     }
-    public void Update(T updated, IDbTransaction? transaction=null)
+    public void Update(T updated, IDbConnection? conn=null, IDbTransaction? transaction = null)
     {
         bool success;
-        success = _query.crud.Update(updated,transaction);
+        success = _query.crud.Update(updated, conn,transaction);
 
         if (!success)
         {

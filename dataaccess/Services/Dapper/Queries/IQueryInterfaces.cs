@@ -59,3 +59,4 @@ public interface IFreeQueryAsync
     public Task<IEnumerable<T>> Query<T>(string sql, Dictionary<string, object>? param, IDbTransaction? transaction = null);
     public Task Query(string sql, Dictionary<string, object>? param, IDbTransaction? transaction = null);
 }
+
