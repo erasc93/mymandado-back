@@ -1,33 +1,33 @@
 ﻿using models.tables;
-using Services.Dapper;
+using Services.Dapper.Queries;
 using Services.Repositories.Abstractions;
 using System.Data;
 
 namespace Services.Repositories;
 
-public class Repo_AnyTable<T>(ICRUDQuery query) : ARepository(query) where T : class, IDbTable
+public class Repo_AnyTable<T>(IQueries query) : ARepository(query) where T : class, IDbTable
 {
     public T? GetById(int id, IDbTransaction? transaction = null)
     {
-        return _query.GetById<T>(id);
+        return _query.crud.GetById<T>(id);
     }
     public T[] GetAll(IDbTransaction? transaction = null)
     {
         T[] output;
-        output = [.. _query.GetAll<T>()];
+        output = [.. _query.crud.GetAll<T>()];
         return output;
     }
 
     public void Add(ref T item, IDbTransaction? transaction = null)
     {
-        int? o = _query.Add(item, transaction);
+        int? o = _query.crud.Add(item, transaction);
     }
 
     public bool Delete(T item, IDbTransaction? transaction = null)
     {
         bool success;
 
-        success = _query.Delete(item, transaction);
+        success = _query.crud.Delete(item, transaction);
 
         if (!success)
         {
@@ -40,7 +40,7 @@ public class Repo_AnyTable<T>(ICRUDQuery query) : ARepository(query) where T : c
     public void Update(T updated, IDbTransaction? transaction=null)
     {
         bool success;
-        success = _query.Update(updated,transaction);
+        success = _query.crud.Update(updated,transaction);
 
         if (!success)
         {

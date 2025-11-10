@@ -28,13 +28,13 @@ namespace api_mandado.Controllers
         [HttpPost("login")]
         public ObjectResult Login([FromBody] LoginInfo loginInfo)
         {
-            TokenType token;
+            AuthResponse token;
             string tokenstr;
             Claim[] claims;
 
             claims = UserClaimInfo(loginInfo);
             tokenstr = _authManager.GenerateJwtTokenAsString(claims);
-            token = new TokenType(tokenstr);
+            token = new AuthResponse(tokenstr);
 
             return Ok(token);
         }
@@ -74,7 +74,7 @@ namespace api_mandado.Controllers
     }
 
 }
-public class TokenType(string tokenstring)
+public class AuthResponse(string tokenstring)
 {
     public string token { get; set; } = tokenstring;
 }

@@ -1,9 +1,9 @@
 ﻿namespace tests_mandado;
 
-public class UnitTest1
+public class TestTestingSetup
 {
     [Fact]
-    public void Test1()
+    public void Tests_TRUE_EQUALS_TRUE()
     {
       Assert.True(true);
     }

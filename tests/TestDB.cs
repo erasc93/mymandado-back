@@ -41,7 +41,16 @@ public class TestDB : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Products_Should_Return_Success()
+    public async Task Test_StoredProcedures_Exist()
+    {
+        StoredProcedure? storedprocedures;
+        storedprocedures = _repoStoredPro.GetStoredProcedures()
+                                        .Where(x => x.ROUTINE_NAME == "sp_tables")
+                                        .First();
+        Assert.NotNull(storedprocedures);
+    }
+    [Fact]
+    public async Task Tests_TableUSERS_HasOneElement()
     {
         StoredProcedure? storedprocedures;
         storedprocedures = _repoStoredPro.GetStoredProcedures()
@@ -52,16 +61,20 @@ public class TestDB : IClassFixture<CustomWebApplicationFactory>
         // ---
         string[] tables;
         string? usersTable;
-        tables = _repoTables.GetTableNames("mymandado");
-        usersTable = tables.Where(x => x == "USERS").First();
-        Assert.NotNull(usersTable);
+        tables = _repoTables.GetTableNames();
+
+        Assert.NotNull(tables);
+        Assert.NotEmpty(tables);
+        Assert.Contains("USERS",tables);
+
+        //usersTable
 
         // ---
         DbInfo_Columns[] columns;
+        usersTable = tables.Where(x => x == "USERS").First();
         columns = _repoTables.GetColumns(usersTable);
         Assert.Contains(columns, col => col.Field == "usr_name");
 
         // ---
-
     }
 }

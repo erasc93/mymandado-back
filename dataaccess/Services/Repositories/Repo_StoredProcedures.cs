@@ -1,6 +1,6 @@
 ﻿using models.information_schema;
 using Mysqlx.Crud;
-using Services.Dapper;
+using Services.Dapper.Queries;
 
 namespace Services.Repositories;
 

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Services.Dapper;
+using Services.Dapper.Queries;
 using Services.Factories;
 using Services.Repositories;
 using System.IdentityModel.Tokens.Jwt;
@@ -34,31 +35,32 @@ public sealed class DI_Services
 
     public void AddDependencies(IServiceCollection services, IConfiguration config)
     {
-        services.AddControllers();
-        services.AddOpenApi();
-
         DBConnection(services, config);
         AddRepositories(services);
-        AddAuthentication(services, config);
+        AddTokenBasedAuthentication(services, config);
         AddFactories(services);
     }
 
-    private void AddAuthentication(IServiceCollection services, IConfiguration configurationManager)
+    private void AddTokenBasedAuthentication(IServiceCollection services, IConfiguration configurationManager)
     {
 
-        string? secretKey = configurationManager["JwtSettings:SecretKey"];
+        string? secretKey;
+        secretKey = configurationManager["JwtSettings:SecretKey"];
+
         if (secretKey is null)
         {
             throw new ArgumentNullException("SecretKey was not provided");
         }
 
-        var alreadyRegistered = services.Any(s =>
-            s.ServiceType == typeof(IConfigureOptions<AuthenticationOptions>));
+        bool alreadyRegistered;
+
+        alreadyRegistered = services.Any(s => s.ServiceType == typeof(IConfigureOptions<AuthenticationOptions>));
         if (!alreadyRegistered)
         {
+            AuthenticationBuilder authBuilder;
+            authBuilder = services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
 
-            AuthenticationBuilder
-                authBuilder = services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
+            //authBuilder.AddJwtBearer(BearerBuilder);
             authBuilder.AddJwtBearer((options) =>
                                                                     {
                                                                         byte[]
@@ -76,8 +78,29 @@ public sealed class DI_Services
         services.AddSingleton<IJwtTokenGenerator>(new JwtTokenGenerator(secretKey, new JwtSecurityTokenHandler()));
         services.AddAuthorization();
         services.AddHttpContextAccessor();
-        services.AddScoped<UserContextService>();
+        services.AddScoped<ClaimsAccessor>();
     }
+
+    //private void BearerBuilder(JwtBearerOptions options)
+    //{
+    //    string? secretKey;
+    //    secretKey = configurationManager["JwtSettings:SecretKey"];
+
+    //    if (secretKey is null)
+    //    {
+    //        throw new ArgumentNullException("SecretKey was not provided");
+    //    }
+
+    //    byte[]
+    //        bytes = Encoding.UTF8.GetBytes(secretKey);
+
+    //    options.TokenValidationParameters = new TokenValidationParameters
+    //    {
+    //        ValidateIssuer = false,
+    //        ValidateAudience = false,
+    //        IssuerSigningKey = new SymmetricSecurityKey(bytes)
+    //    };
+    //}
 
     private void AddFactories(IServiceCollection services)
     {
@@ -100,8 +123,17 @@ public sealed class DI_Services
             throw new ArgumentNullException("Connection String was not provided for MySQL access.");
         }
         services.AddSingleton<IConnectionInformation_DB>(new ConnectionInformation_DB(connectionString));
-        services.AddScoped<ICRUDQuery, DapperMySQL_DataAccess>();
-        services.AddScoped<IFreeQuery, DapperMySQL_DataAccess>();
+
+        //services.AddScoped<IQueries, Queries>();
+        services.AddScoped<IQueries, Queries>();
+
+        services.AddScoped<ICRUD, CRUD>();
+        services.AddScoped<IBulk, BulkCRUD>();
+        services.AddScoped<IFreeQuery, FreeQuery>();
+
+        services.AddScoped<ICRUDAsync, CRUDAsync>();
+        services.AddScoped<IBulkAsync, BulkAsync>();
+        services.AddScoped<IFreeQueryAsync, FreeQueryAsync>();
 
 
         services.AddScoped<Repo_StoredProcedures>();

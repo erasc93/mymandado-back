@@ -2,11 +2,11 @@
 
 namespace api_mandado.services;
 
-public class UserContextService
+public class ClaimsAccessor
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UserContextService(IHttpContextAccessor accessor)
+    public ClaimsAccessor(IHttpContextAccessor accessor)
     {
         _httpContextAccessor = accessor;
     }

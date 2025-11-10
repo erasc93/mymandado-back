@@ -1,13 +1,13 @@
 ﻿using core_mandado.Users;
 using models.tables;
-using Services.Dapper;
+using Services.Dapper.Queries;
 using Services.Repositories.Abstractions;
 using Services.Repositories.Interfaces;
 using System.Data;
 
 namespace core;
 
-public class Repo_Users(ICRUDQuery query) : ARepository(query),
+public class Repo_Users(IQueries query) : ARepository(query),
                                             IRepo_Users,
                                             IRepo_CREATE<User>, IRepo_READ<User>, IRepo_DELETE<User>, IRepo_UPDATE<User>
 {
@@ -18,18 +18,29 @@ public class Repo_Users(ICRUDQuery query) : ARepository(query),
     }
     public User GetCurrent()
     {
-        User u = new User() { id = 1, name = "manu" };
+        User
+            u = new User() { id = 1, name = "manu" };
         return u;
     }
     public User? GetUserByName(string userName)
     {
         string query;
-        query = $"select * from USERS where usr_name='{userName}'";
-        MND_USERS[] mndusers = _query.Query<MND_USERS>(query).ToArray();
+        Dictionary<string, object> param;
+
+        param = new Dictionary<string, object>()
+                    {
+                        {"@username",userName},
+                    };
+        query = $"select * from USERS where usr_name=@username";
+        MND_USERS[] mndusers = _query.free.Query<MND_USERS>(query,param).ToArray();
 
         User? output;
         output = (from u in mndusers
-                  select new User() { id = u.usr_id, name = u.usr_name }
+                  select new User()
+                  {
+                      id = u.usr_id,
+                      name = u.usr_name,
+                  }
                   ).FirstOrDefault();
 
         return output;
@@ -37,7 +48,7 @@ public class Repo_Users(ICRUDQuery query) : ARepository(query),
     public User[] GetAll()
     {
         MND_USERS[] mndusers;
-        mndusers = _query.GetAll<MND_USERS>().ToArray();
+        mndusers = _query.crud.GetAll<MND_USERS>().ToArray();
 
         User[] output;
         output = (from u in mndusers
@@ -51,7 +62,7 @@ public class Repo_Users(ICRUDQuery query) : ARepository(query),
     {
         MND_USERS mnduser;
         mnduser = new MND_USERS() { usr_name = userName };
-        int? o = _query.Add(mnduser);
+        int? o = _query.crud.Add(mnduser);
         User output;
         output = new User()
         {
@@ -77,7 +88,7 @@ public class Repo_Users(ICRUDQuery query) : ARepository(query),
             usr_name = user.name
         };
 
-        success = _query.Delete(mnduser);
+        success = _query.crud.Delete(mnduser);
 
         if (!success)
         {
@@ -98,7 +109,7 @@ public class Repo_Users(ICRUDQuery query) : ARepository(query),
             usr_id = updated.id,
             usr_name = updated.name
         };
-        success = _query.Update(mnduser);
+        success = _query.crud.Update(mnduser);
 
         if (!success)
         {

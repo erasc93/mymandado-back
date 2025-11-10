@@ -12,7 +12,7 @@ using Services.Repositories;
 using tests_mandado.utilities;
 using Xunit;
 
-public class TestLogic : IClassFixture<CustomWebApplicationFactory>
+public class TestLogic : IClassFixture<MymandadoWebAppFactory>
 {
 
 
@@ -25,7 +25,7 @@ public class TestLogic : IClassFixture<CustomWebApplicationFactory>
     private readonly IRepo_Users _repoUsers;
     private readonly IRepo_Cart _repoCart;
     private readonly IRepo_Products _repoProducts;
-    public TestLogic(CustomWebApplicationFactory factory)
+    public TestLogic(MymandadoWebAppFactory factory) 
     {
         IServiceScope scope;
         scope = factory.Services.CreateScope();

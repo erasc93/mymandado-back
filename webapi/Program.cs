@@ -5,7 +5,7 @@ namespace api_mymandado;
 
 public class Program
 {
-    private const string CORS_NAME= "AllowAll";
+    private const string CORS_NAME = "AllowAll";
     public static void Main(string[] args)
     {
 
@@ -18,6 +18,9 @@ public class Program
 
 
         DI_Services.instance.AddDependencies(builder.Services, builder.Configuration);
+
+        builder.Services.AddControllers();
+        builder.Services.AddOpenApi();
 
         builder.Services.AddCors((options) =>
         {

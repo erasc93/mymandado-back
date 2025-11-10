@@ -1,18 +1,18 @@
 ﻿using core_mandado.Products;
 using models.tables;
 using MySql.Data.MySqlClient;
-using Services.Dapper;
+using Services.Dapper.Queries;
 using Services.Factories;
 using Services.Repositories;
 using Services.Repositories.Abstractions;
 
 namespace core;
-public class Repo_Products : ARepository, 
+public class Repo_Products : ARepository,
                             IRepo_Products
 {
     private Repo_AnyTable<MND_PRODUCT> _repo_PRD { get; init; }
     private FactoryProducts _facProd { get; init; }
-    public Repo_Products(ICRUDQuery query, Repo_AnyTable<MND_PRODUCT> repoTables, FactoryProducts facProducts) : base(query)
+    public Repo_Products(IQueries query, Repo_AnyTable<MND_PRODUCT> repoTables, FactoryProducts facProducts) : base(query)
     {
         _repo_PRD = repoTables;
         _facProd = facProducts;
@@ -53,12 +53,13 @@ public class Repo_Products : ARepository,
         //sql = $"select * from MND_PRODUCTS WHERE prd_name={name};";
 
         //MND_PRODUCT p = new MND_PRODUCT() { prd_id = id, prd_name = "fuck" };
-        MND_PRODUCT p = _query.GetById<MND_PRODUCT>(id)!;
-        bool success = _query.Delete(p);
+        MND_PRODUCT p = _query.crud.GetById<MND_PRODUCT>(id)!;
+        bool success = _query.crud.Delete(p);
 
         if (!success)
         {
-            string msg = $"item {p} could not be removed";
+            string
+                msg = $"item {p} could not be removed";
             throw new Exception(msg);
         }
     }
@@ -66,7 +67,7 @@ public class Repo_Products : ARepository,
     {
         string sql;
         sql = $"select * from MND_PRODUCTS WHERE prd_name={name};";
-        MND_PRODUCT? p = _query.Query<MND_PRODUCT>(sql).FirstOrDefault();
+        MND_PRODUCT? p = _query.free.Query<MND_PRODUCT>(sql).FirstOrDefault();
 
     }
 

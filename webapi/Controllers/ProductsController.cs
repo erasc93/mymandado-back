@@ -13,10 +13,10 @@ public class ProductsController : ControllerBase
 {
     private IRepo_Products _productsRepository { get; init; }
     private string? username { get; init; }
-    private UserContextService _svc_context { get; init; }
+    private ClaimsAccessor _svc_context { get; init; }
     public ProductsController(
         IRepo_Products productsRepo,
-        UserContextService svc_context
+        ClaimsAccessor svc_context
         )
     {
         _svc_context = svc_context;
