@@ -51,7 +51,6 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
             userName = "usertest13";
         try
         {
-
             _fac.SecureTest((conn, trans) =>
             {
                 User[]
@@ -68,11 +67,9 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
         }
         catch (TestFailureException)
         {
-            _fac.SecureTest((conn, trans) =>
-            {
-                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
-                Assert.Null(testUser);
-            });
+
+            testUser = _fac._repoUsers.GetUserByName(userName);
+            Assert.Null(testUser);
         }
     }
     [Fact]

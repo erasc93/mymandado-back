@@ -11,7 +11,10 @@ public interface IRepo_Users
     User[] GetAll(IDbConnection? conn = null, IDbTransaction? trans = null);
     User AddByName(string userName, IDbConnection conn, IDbTransaction trans);
     User AddByName(string userName);
+
     void Add(ref User item);
+    void Add(ref User item, IDbConnection conn, IDbTransaction trans);
+
     bool Delete(User user, IDbConnection? conn=null, IDbTransaction? trans=null);
     void Update(User updated);
 

@@ -18,7 +18,7 @@ public class MymandadoWebAppFactory : ACustomWebApplicationFactory
     private readonly Repo_TableInfos _repoTables;
     private readonly IQueries _queries;
 
-    private readonly Repo_AnyTable<MND_PRODUCT> _repoDBProducts;
+    public readonly Repo_AnyTable<MND_PRODUCT> _repoDBProducts;
     private readonly Repo_AnyTable<MND_USERS> _USERS;
     private readonly Repo_AnyTable<MND_CART_ITEM> _CART_ITEMS;
     private readonly Repo_AnyTable<MND_CART> _CART;

@@ -1,4 +1,5 @@
 ﻿using core_mandado.Cart;
+using core_mandado.parameters;
 using core_mandado.Products;
 using core_mandado.Users;
 using models.tables;
@@ -10,23 +11,29 @@ namespace core;
 
 public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
 {
+    private const string DESC = "";
+    private const string NAME = "cart";
+    public Cart AddNew(User user, int cartnumber, IDbConnection? conn = null, IDbTransaction? transac = null)
+    {
+        MND_CART
+            firstCart = new MND_CART
+            {
+                //car_id = APP_PARAMS.instance.UNDEFINED,
+                car_usrid = user.id,
+                car_crtnb = cartnumber,
+                car_desc = DESC,
+                car_name = NAME,
+            };
+        _query.crud.Add<MND_CART>(ref firstCart, conn, transac);
+        return Factory.FillRAW(firstCart, [], []);
+    }
 
     public void AddToCart(Product newproduct)
     {
         throw new Exception();
     }
 
-    public Cart[] GetAll(User user)
-    {
-        Cart[] output = [];
-
-        _query.ExecuteInTransaction((connect, transact) =>
-        {
-            output = GetAll(user, connect, transact);
-        });
-        return output;
-    }
-    public Cart[] GetAll(User user, IDbConnection connect, IDbTransaction transact)
+    public Cart[] GetAll(User user, IDbConnection? connect = null, IDbTransaction? transact = null)
     {
         Cart[] output = [];
 
@@ -45,7 +52,17 @@ public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
 
         return output;
     }
-    private MND_CART[] QueryCARTS(User user, IDbConnection connect, IDbTransaction transact)
+
+    public void Remove(Cart newCart, IDbConnection? conn, IDbTransaction? trans)
+    {
+        MND_CART mndcart = Factory.FromView(newCart);
+        if (!_query.crud.Delete<MND_CART>(mndcart, conn, trans))
+        {
+            throw new Exception($"cart no {newCart.numero}, for user : {newCart.userid} could not be deleted;");
+        }
+    }
+
+    private MND_CART[] QueryCARTS(User user, IDbConnection? connect = null, IDbTransaction? transact = null)
     {
         Dictionary<string, object>
             param = new() { { "@car_usrid", user.id } };
@@ -90,8 +107,11 @@ public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
         {
             return new Cart
             {
+                id = car.car_id,
                 numero = car.car_crtnb,
                 userid = car.car_usrid,
+                name = car.car_name,
+                description = car.car_desc,
                 items = (from MND_CART_ITEM itm in mnd_cartitems
                          select new CartItem
                          {
@@ -113,9 +133,12 @@ public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
         {
             return new Cart
             {
+                id = car.car_id,
                 numero = car.car_crtnb,
                 userid = car.car_usrid,
-                items = BuildItemsInList(car, mnd_cartitems, products)
+                items = BuildItemsInList(car, mnd_cartitems, products),
+                name = car.car_name,
+                description = car.car_desc,
             };
         }
         private static CartItem[] BuildItemsInList(MND_CART car_crtnb, MND_CART_ITEM[] mnd_cartitems, MND_PRODUCT[] products)
@@ -141,5 +164,21 @@ public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
                         unit = prd.prd_unit
                     }).First();
         }
+
+        internal static MND_CART FromView(Cart cart)
+        {
+            MND_CART output = new MND_CART()
+            {
+                car_id = cart.id,
+                car_crtnb = cart.numero,
+                car_desc = cart.description,
+                car_name = cart.name,
+                car_usrid = cart.userid,
+
+            };
+            return output;
+        }
+
+
     }
 }

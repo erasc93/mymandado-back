@@ -10,13 +10,13 @@ using System.Data;
 namespace core;
 
 public class Repo_Users(
-                        IQueries query,
-                        IRepo_CartItems _repo_CartItems
+                            IQueries query,
+                            IRepo_Cart _repoCart,
+                            IRepo_CartItems _repo_CartItems
                         ) : ARepository(query),
                           IRepo_Users,
                           IRepo_CREATE<User>, IRepo_READ<User>, IRepo_DELETE<User>, IRepo_UPDATE<User>
 {
-
     public bool Login(LoginInfo login)
     {
         return login.username == "manu" || login.username == "cleo";
@@ -74,17 +74,8 @@ public class Repo_Users(
                 usr_name = userName,
                 usr_role = User.Role.friend
             };
-
         _query.crud.Add<MND_USERS>(ref mnduser, c, t);
-        MND_CART
-            firstCart = new MND_CART
-            {
-                car_crtnb = 0,
-                car_desc = "",
-                car_name = "cart",
-                car_usrid = mnduser.usr_id
-            };
-        _query.crud.Add<MND_CART>(ref firstCart, c, t);
+
         User
             output = new User()
             {
@@ -93,8 +84,12 @@ public class Repo_Users(
                 role = mnduser.usr_role
             };
 
+
+        Cart cart = _repoCart.AddNew(output,0,c, t);
+
         return output;
     }
+    //private
     public User? AddByName(string userName)
     {
         User?
@@ -134,6 +129,10 @@ public class Repo_Users(
     public void Add(ref User item)
     {
         item = AddByName(item.name)!;
+    }
+    public void Add(ref User item, IDbConnection conn , IDbTransaction trans )
+    {
+        item = AddByName(item.name,conn,trans);
     }
 
     public bool Delete(User user, IDbConnection? connection = null, IDbTransaction? transaction = null)

@@ -1,11 +1,4 @@
-﻿using core_mandado.Cart;
-using core_mandado.Products;
-using core_mandado.Users;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using models.tables;
-using Services.Dapper.Interfaces;
-using Services.Repositories;
+﻿using core_mandado.Products;
 using System.Data;
 using tests_mandado.utilities;
 
@@ -92,7 +85,6 @@ public class Test_RepoProducts(MymandadoWebAppFactory _fac) : IClassFixture<Myma
             Assert.False(productExists);
         });
     }
-
     [Fact]
     public void TEST_WhenUpdated()
     {
