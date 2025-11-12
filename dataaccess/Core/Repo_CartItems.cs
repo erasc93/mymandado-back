@@ -8,27 +8,22 @@ using Services.Repositories;
 using Services.Repositories.Abstractions;
 
 namespace core;
-public class Repo_CartItems : ARepository,
-                        IRepo_CartItems
-{
-
-    private Repo_AnyTable<MND_CART_ITEM> _repo_CRT { get; init; }
-    private Repo_AnyTable<MND_PRODUCT> _repo_PRD { get; init; }
-    private IRepo_Products _repoProducts { get; init; }
-    private Repo_AnyTable<MND_USERS> _repo_USR { get; init; }
-    public Repo_CartItems(IQueries query,
+public class X(IQueries query,
             IRepo_Products repoProducts,
             Repo_AnyTable<MND_CART_ITEM> repoCartItems,
             Repo_AnyTable<MND_USERS> repoUsers,
             Repo_AnyTable<MND_PRODUCT> repoPRD
-        ) : base(query)
-    {
-        _repo_CRT = repoCartItems;
-        _repo_PRD = repoPRD;
-        _repoProducts = repoProducts;
-        _repo_USR = repoUsers;
-    }
-
+        ) : ARepository(query)
+{
+}
+public class Repo_CartItems(IQueries _query,
+                            IRepo_Products _repoProducts,
+                            Repo_AnyTable<MND_CART_ITEM> _CRT_ITEMS,
+                            Repo_AnyTable<MND_USERS> _repoUsers,
+                            Repo_AnyTable<MND_PRODUCT> _PRDODUCTS
+                            ) : ARepository(_query),
+                                IRepo_CartItems
+{
     public void Add(int cartNumber, ref CartItem item, User user)
     {
         MND_CART_ITEM model;
@@ -44,7 +39,7 @@ public class Repo_CartItems : ARepository,
         }
 
         model = Factory.FromView(cartNumber, item, user);
-        model.crt_itid=_repo_CRT.Add(ref model);
+        model.crt_itid = _CRT_ITEMS.Add(ref model);
         item.id = model.crt_itid;
     }
     public void Update(int cartNumber, CartItem item, User user)
@@ -61,13 +56,13 @@ public class Repo_CartItems : ARepository,
             crt_qtty = item.quantity
         };
 
-        _repo_CRT.Update(mnd_cart_item);
+        _CRT_ITEMS.Update(mnd_cart_item);
     }
     public CartItem[] GetAll(User user)
     {
         CartItem[] output;
 
-        MND_CART_ITEM[] crts = _repo_CRT.GetAll();
+        MND_CART_ITEM[] crts = _CRT_ITEMS.GetAll();
         //MND_PRODUCT[] prds = _repo_PRD.GetAll();
         Product[] prds = _repoProducts.GetAll();
 
@@ -87,7 +82,7 @@ public class Repo_CartItems : ARepository,
     }
     public void RemoveById(int id)
     {
-        bool success = _repo_CRT.Delete(
+        bool success = _CRT_ITEMS.Delete(
             new MND_CART_ITEM()
             {
                 crt_itid = id,
@@ -109,11 +104,11 @@ public class Repo_CartItems : ARepository,
     {
 
         MND_PRODUCT[]
-            products = _repo_PRD.GetAll(c, t);
+            products = _PRDODUCTS.GetAll(c, t);
         MND_CART_ITEM[]
             newitems = Factory.ToCART_ITEMS(userid, cartnumber, products, isdone: false);
         //foreach(newitems)
-        _repo_CRT.Add(ref newitems, c, t);
+        _CRT_ITEMS.Add(ref newitems, c, t);
     }
 
     // --- --- ---

@@ -11,37 +11,11 @@ using tests_mandado.utilities;
 
 namespace tests_mandado.Repositories;
 
-public class Test_RepoProducts : IClassFixture<MymandadoWebAppFactory>
+public class Test_RepoProducts(MymandadoWebAppFactory _fac) : IClassFixture<MymandadoWebAppFactory>
 {
-    //private readonly Repo_StoredProcedures _repoStoredPro;
-    //private readonly Repo_TableInfos _repoTables;
-    //private readonly Repo_AnyTable<MND_PRODUCT> _repoDBProducts;
-
-    //private readonly IQueries _queries;
-
-    //private readonly IRepo_CartItems _repoCartItems;
-    //private readonly IRepo_Products _repoProducts;
-    //private readonly IRepo_Users _repoUsers;
-    //private readonly IRepo_Cart _repoCart;
-    private MymandadoWebAppFactory _fac { get; init; }
-    public Test_RepoProducts(MymandadoWebAppFactory fac)
-    {
-        _fac = fac;
-
-        //using IServiceScope
-        //    scope = _fac.Services.CreateScope();
-
-        //_repoCart = fac.Svc<IRepo_Cart>(scope)!;
-        ////_repoUsers = fac.Svc<IRepo_Users>(scope)!;
-        //_repoProducts = fac.Svc<IRepo_Products>(scope)!;
-        //_repoDBProducts = fac.Svc<Repo_AnyTable<MND_PRODUCT>>(scope)!;
-        //_repoCartItems = fac.Svc<IRepo_CartItems>(scope)!;
-        //_queries = fac.Svc<IQueries>(scope)!;
-
-    }
-
     private const string PRD = "test";
     private const int UNDEFINED = -13;
+
     [Fact]
     public void TEST_TestProduct_DoesNotExist()
     {

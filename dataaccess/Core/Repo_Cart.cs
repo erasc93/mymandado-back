@@ -8,9 +8,8 @@ using System.Data;
 
 namespace core;
 
-public class Repo_Cart : ARepository, IRepo_Cart
+public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
 {
-    public Repo_Cart(IQueries query) : base(query) { }
 
     public void AddToCart(Product newproduct)
     {
@@ -23,7 +22,7 @@ public class Repo_Cart : ARepository, IRepo_Cart
 
         _query.ExecuteInTransaction((connect, transact) =>
         {
-            output = GetAll(user,connect,transact);
+            output = GetAll(user, connect, transact);
         });
         return output;
     }

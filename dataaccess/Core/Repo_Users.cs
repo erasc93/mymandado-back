@@ -9,15 +9,13 @@ using System.Data;
 
 namespace core;
 
-public class Repo_Users : ARepository,
+public class Repo_Users(
+                        IQueries query,
+                        IRepo_CartItems _repo_CartItems
+                        ) : ARepository(query),
                           IRepo_Users,
                           IRepo_CREATE<User>, IRepo_READ<User>, IRepo_DELETE<User>, IRepo_UPDATE<User>
 {
-    private IRepo_CartItems _repo_CartItems { get; init; }
-    public Repo_Users(IQueries query, IRepo_CartItems repo_CartItems) : base(query)
-    {
-        _repo_CartItems = repo_CartItems;
-    }
 
     public bool Login(LoginInfo login)
     {

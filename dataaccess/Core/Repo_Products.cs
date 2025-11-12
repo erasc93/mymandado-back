@@ -6,14 +6,11 @@ using Services.Repositories.Abstractions;
 using System.Data;
 
 namespace core;
-public class Repo_Products : ARepository,
-                            IRepo_Products
+public class Repo_Products(
+                            IQueries query,
+                            Repo_AnyTable<MND_PRODUCT> _repo_PRD
+                            ) : ARepository(query), IRepo_Products
 {
-    private Repo_AnyTable<MND_PRODUCT> _repo_PRD { get; init; }
-    public Repo_Products(IQueries query, Repo_AnyTable<MND_PRODUCT> repoTables) : base(query)
-    {
-        _repo_PRD = repoTables;
-    }
 
     public Product[] GetAll(IDbConnection? connection = null, IDbTransaction? transaction = null)
     {
@@ -63,11 +60,11 @@ public class Repo_Products : ARepository,
         }
     }
 
-    public void Update(Product value, IDbConnection?conn=null,IDbTransaction?transac=null)
+    public void Update(Product value, IDbConnection? conn = null, IDbTransaction? transac = null)
     {
         MND_PRODUCT
             p = Factory.FromView(value);
-        _repo_PRD.Update(p,conn,transac);
+        _repo_PRD.Update(p, conn, transac);
     }
 
 
