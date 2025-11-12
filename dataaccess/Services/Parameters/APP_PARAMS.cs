@@ -9,5 +9,5 @@ internal sealed class APP_PARAMS
     private APP_PARAMS() { }
 
 
-    public int UNDEFINED=-13;
+    public int UNDEFINED { get; } = -13;
 }

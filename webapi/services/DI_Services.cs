@@ -10,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using Services.Dapper;
 using Services.Dapper.Interfaces;
 using Services.Dapper.Queries;
-using Services.Factories;
 using Services.Repositories;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
@@ -105,7 +104,7 @@ public sealed class DI_Services
 
     private void AddFactories(IServiceCollection services)
     {
-        services.AddSingleton<FactoryProducts>();
+        //services.AddSingleton<FactoryProducts>();
     }
     private void AddRepositories(IServiceCollection services)
     {

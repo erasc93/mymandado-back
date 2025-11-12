@@ -29,12 +29,11 @@ public class Queries : IQueries
     public IBulkAsync bulkAsync { get; private set; }
     public void ExecuteInTransaction(Action<IDbConnection, IDbTransaction> action)
     {
-
-
-        using IDbConnection conn = new MySqlConnection(_credentialDatabase.ConnectionString);
+        using IDbConnection 
+            conn = new MySqlConnection(_credentialDatabase.ConnectionString);
         conn.Open();
-        using IDbTransaction transaction = conn.BeginTransaction();
-
+        using IDbTransaction 
+            transaction = conn.BeginTransaction();
         try
         {
             action(conn, transaction);

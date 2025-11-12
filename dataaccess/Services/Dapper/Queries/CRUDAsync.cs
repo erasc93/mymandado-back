@@ -50,7 +50,7 @@ public class CRUDAsync : ICRUDAsync
         if (useOwnConnection) { conn.Close(); }
         return output;
     }
-    public async Task<IEnumerable<T>> GetAll<T>(IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
+    public async Task<T[]> GetAll<T>(IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
     {
         IEnumerable<T> output;
         bool
@@ -61,7 +61,7 @@ public class CRUDAsync : ICRUDAsync
         output = await conn.GetAllAsync<T>(transaction);
         if (useOwnConnection) { conn.Close(); }
 
-        return output;
+        return output.ToArray();
     }
     public async Task<T?> GetById<T>(int id, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
     {

@@ -15,18 +15,34 @@ public class CRUD : ICRUD
     }
 
 
-    public int? Add<T>(T entityToInsert, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
+    public int Add<T>(ref T entityToInsert, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
     {
-        int? id = null;
+        int id;
         bool
             useOwnConnection = conn is null;
         conn ??= new MySqlConnection(_credentialDatabase.ConnectionString);
 
         if (useOwnConnection) { conn.Open(); }
-        id = (int?)conn.Insert(entityToInsert);
+        id = (int)conn.Insert(entityToInsert); // todo: verify update id works
         if (useOwnConnection) { conn.Close(); }
         return id;
     }
+
+    ///<summary>element is updated when inserted</summary>
+    /// <returns>number of inserted rows</returns>
+    public int Add<T>(ref T[] entityToInsert, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
+    {
+        int id;
+        bool
+            useOwnConnection = conn is null;
+        conn ??= new MySqlConnection(_credentialDatabase.ConnectionString);
+
+        if (useOwnConnection) { conn.Open(); }
+        id = (int)conn.Insert(entityToInsert);
+        if (useOwnConnection) { conn.Close(); }
+        return id;
+    }
+
     public bool Update<T>(T entityToUpdate, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
     {
         bool
@@ -41,7 +57,6 @@ public class CRUD : ICRUD
     }
     public bool Delete<T>(T entityToUpdate, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
     {
-
         bool
             useOwnConnection = conn is null,
             success;
@@ -52,7 +67,7 @@ public class CRUD : ICRUD
         if (useOwnConnection) { conn.Close(); }
         return success;
     }
-    public IEnumerable<T> GetAll<T>(IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
+    public T[] GetAll<T>(IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
     {
         IEnumerable<T> output;
         bool
@@ -63,7 +78,7 @@ public class CRUD : ICRUD
         output = conn.GetAll<T>(transaction);
         if (useOwnConnection) { conn.Close(); }
 
-        return output;
+        return output.ToArray();
 
     }
     public T? GetById<T>(int id, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class

@@ -2,7 +2,6 @@
 
 namespace tests_mandado.utilities;
 
-using api_mandado.Controllers;
 using api_mandado.services;
 using api_mymandado;
 using Microsoft.AspNetCore.Hosting;
@@ -11,18 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Runtime.InteropServices;
-
-public class MymandadoWebAppFactory : CustomWebApplicationFactory
-{
-    protected override void AddControllers(IServiceCollection services)
-    {
-        services.AddScoped<WeatherForecastController>();
-        services.AddScoped<UsersController>();
-        services.AddScoped<ProductsController>();
-        services.AddScoped<CartItemsController>();
-    }
-}
-public abstract class CustomWebApplicationFactory : WebApplicationFactory<Program>
+public abstract class ACustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

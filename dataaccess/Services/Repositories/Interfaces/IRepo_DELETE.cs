@@ -1,3 +1,5 @@
-﻿namespace Services.Repositories.Interfaces;
+﻿using System.Data;
 
-public interface IRepo_DELETE<T> { bool Delete(T item); }
+namespace Services.Repositories.Interfaces;
+
+public interface IRepo_DELETE<T> { bool Delete(T item, IDbConnection? connection = null, IDbTransaction? transaction = null); }

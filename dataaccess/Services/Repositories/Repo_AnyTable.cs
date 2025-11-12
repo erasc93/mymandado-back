@@ -7,27 +7,34 @@ namespace Services.Repositories;
 
 public class Repo_AnyTable<T>(IQueries query) : ARepository(query) where T : class, IDbTable
 {
-    public T? GetById(int id, IDbTransaction? transaction = null)
+    public T? GetById(int id, IDbConnection? conn = null, IDbTransaction? transaction = null)
     {
-        return _query.crud.GetById<T>(id);
+        return _query.crud.GetById<T>(id,conn,transaction);
     }
-    public T[] GetAll(IDbTransaction? transaction = null)
+    public T[] GetAll(IDbConnection? conn = null, IDbTransaction? transaction = null)
     {
         T[] output;
-        output = [.. _query.crud.GetAll<T>()];
+        output = _query.crud.GetAll<T>(conn, transaction);
         return output;
     }
 
-    public void Add(ref T item, IDbConnection? conn=null,IDbTransaction? transaction = null)
+    /// <summary>item id is already updated </summary>
+    /// <returns>id of created element</returns>
+    public int Add(ref T item, IDbConnection? conn = null, IDbTransaction? transaction = null)
     {
-        int? o = _query.crud.Add(item, conn,transaction);
+        int o = _query.crud.Add(ref item, conn, transaction);
+        return o;
+    }
+    public int Add(ref T[] item, IDbConnection c, IDbTransaction t)
+    {
+        return _query.crud.Add(ref item, c, t);
     }
 
-    public bool Delete(T item, IDbConnection? conn=null, IDbTransaction? transaction = null)
+    public bool Delete(T item, IDbConnection? conn = null, IDbTransaction? transaction = null)
     {
         bool success;
 
-        success = _query.crud.Delete(item, conn,transaction);
+        success = _query.crud.Delete(item, conn, transaction);
 
         if (!success)
         {
@@ -37,10 +44,10 @@ public class Repo_AnyTable<T>(IQueries query) : ARepository(query) where T : cla
         }
         return success;
     }
-    public void Update(T updated, IDbConnection? conn=null, IDbTransaction? transaction = null)
+    public void Update(T updated, IDbConnection? conn = null, IDbTransaction? transaction = null)
     {
         bool success;
-        success = _query.crud.Update(updated, conn,transaction);
+        success = _query.crud.Update(updated, conn, transaction);
 
         if (!success)
         {

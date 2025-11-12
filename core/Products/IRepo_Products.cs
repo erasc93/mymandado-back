@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
 
 namespace core_mandado.Products;
+
 public interface IRepo_Products
 {
-    Product[] GetAll();
-    void Add(ref Product item);
-    Product GetById(int id);
-    void RemoveItem(int id);
-    void Update(Product value);
+    Product[] GetAll(IDbConnection? connection = null, IDbTransaction? transaction = null);
+    Product? GetById(int id,IDbConnection? connection = null, IDbTransaction? transaction = null);
+
+    void Add(ref Product product, IDbConnection? conn = null, IDbTransaction? trans = null);
+    void RemoveItem(int id, IDbConnection? conn = null, IDbTransaction? trans = null);
+
+    void Update(Product value,IDbConnection? connection = null, IDbTransaction? transaction = null);
 }
-//public interface IProductsRepository<T> where T:class
-//{
-//    T[] GetAll();
-//    void Add(ref T item);
-//    T GetById(int id);
-//    void RemoveById(int id);
-//    void Update(string value);
-//}

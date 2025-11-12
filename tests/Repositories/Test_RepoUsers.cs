@@ -3,8 +3,10 @@ using core_mandado.Products;
 using core_mandado.Users;
 using Microsoft.Extensions.DependencyInjection;
 using models.tables;
+using Services.Dapper.Interfaces;
 using Services.Repositories;
 using tests_mandado.utilities;
+using ZstdSharp.Unsafe;
 
 namespace tests_mandado.Repositories;
 
@@ -12,87 +14,132 @@ public class Test_RepoUsers : IClassFixture<MymandadoWebAppFactory>
 {
 
 
-    private readonly Repo_StoredProcedures _repoStoredPro;
-    private readonly Repo_TableInfos _repoTables;
+    //private readonly Repo_StoredProcedures _repoStoredPro;
+    //private readonly Repo_TableInfos _repoTables;
+    //private readonly Repo_AnyTable<MND_PRODUCT> _repoDBProducts;
 
+    //private readonly IRepo_CartItems _repoCartItems;
+    //private readonly IRepo_Products _repoProducts;
+    //private readonly IRepo_Users _repoUsers;
+    //private readonly IRepo_Cart _repoCart;
+    //private readonly IQueries _queries;
+    private MymandadoWebAppFactory _fac;
 
-    private readonly Repo_AnyTable<MND_PRODUCT> _repoDBProducts;
-
-    private readonly IRepo_Users _repoUsers;
-    private readonly IRepo_CartItems _repoCartItems;
-    private readonly IRepo_Cart _repoCart;
-    private readonly IRepo_Products _repoProducts;
-    public Test_RepoUsers(MymandadoWebAppFactory factory)
+    public Test_RepoUsers(MymandadoWebAppFactory fac)
     {
-        IServiceScope scope;
-        scope = factory.Services.CreateScope();
-        using (scope)
-        {
-            _repoCart = scope.ServiceProvider.GetRequiredService<IRepo_Cart>();
-            _repoUsers = scope.ServiceProvider.GetRequiredService<IRepo_Users>();
-            _repoProducts = scope.ServiceProvider.GetRequiredService<IRepo_Products>();
-            _repoDBProducts = scope.ServiceProvider.GetRequiredService<Repo_AnyTable<MND_PRODUCT>>();
-            _repoCartItems = scope.ServiceProvider.GetRequiredService<IRepo_CartItems>();
-        }
+        //IServiceScope
+        //    scope = fac.Services.CreateScope();
+        //using (scope)
+        //{
+        //    _repoCart = fac.Svc<IRepo_Cart>(scope)!;
+        //    _repoUsers = fac.Svc<IRepo_Users>(scope)!;
+        //    _repoProducts = fac.Svc<IRepo_Products>(scope)!;
+        //    _repoDBProducts = fac.Svc<Repo_AnyTable<MND_PRODUCT>>(scope)!;
+        //    _repoCartItems = fac.Svc<IRepo_CartItems>(scope)!;
+        //    _queries = fac.Svc<IQueries>(scope)!;
+        //}
+        _fac = fac;
     }
 
     [Fact]
-    public void UserCRUD()
+    public void TEST_CreateDeleteUsers()
     {
-        User[] allUsers = _repoUsers.GetAll();
-        Assert.NotEmpty(allUsers);
-        string userName = "usertest4";
-        User? u;
-        u = _repoUsers.GetUserByName(userName);
-        Assert.Null(u);
-
-        u = _repoUsers.AddByName(userName);
-        u = _repoUsers.GetUserByName(userName);
-        Assert.NotNull(u);
-        Cart[] userCarts;
-        Cart? firstCart;
-
-        userCarts = _repoCart.GetAll(u);
-        Assert.NotEmpty(userCarts);
-        firstCart = userCarts[0];
-
-        Assert.NotNull(firstCart);
-        Assert.NotNull(firstCart.items);
-        Assert.Empty(firstCart.items);
-
-        Product newproduct;
-        newproduct = new Product()
+        User userWhenFound;
+        _fac.SecureTest((conn, trans) =>
         {
-            id = 0,
-            name = "testproduct2",
-            unit = "g"
-        };
+            User? testUser;
+            User[]
+                allUsers = _fac._repoUsers.GetAll(conn, trans);
+            Assert.NotEmpty(allUsers);
+            string
+                userName = "usertest13";
+            testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+            Assert.Null(testUser);
 
-        CartItem item = new CartItem
-        {
-            id = -13,
-            product = newproduct,
-            quantity = 3,
-            isdone = false
-        };
+            testUser = _fac._repoUsers.AddByName(userName, conn, trans);
+            testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+            Assert.NotNull(testUser);
+            userWhenFound = testUser;
 
-        _repoCartItems.Add(firstCart.numero, ref item, u);
+            Cart[]
+                carts = _fac._repoCart.GetAll(testUser, conn, trans);
+            Assert.NotEmpty(carts);
+            Cart?
+                firstCart = carts[0];
+            Assert.NotNull(firstCart);
+            Assert.NotNull(firstCart.items);
+            Assert.Empty(firstCart.items);
 
-        userCarts = _repoCart.GetAll(u);
-        Assert.NotEmpty(userCarts);
-        firstCart = userCarts[0];
+            _fac._repoUsers.Delete(testUser, conn, trans);
+            testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+            Assert.Null(testUser);
 
-        Assert.NotNull(firstCart);
-        Assert.NotNull(firstCart.items);
-        Assert.NotEmpty(firstCart.items);
-
-        _repoProducts.RemoveItem(newproduct.id);
-        //_repoProducts.Add(ref newproduct);
-        //_repoCart.AddToCart(newproduct);
-        //_repoCartItems.Add(0, ref userCarts[0], u);
-
-        _repoUsers.Delete(u);
-        u = _repoUsers.GetUserByName(userName);
-        Assert.Null(u);
+            carts = _fac._repoCart.GetAll(userWhenFound, conn, trans);
+            Assert.Empty(carts);
+        });
     }
+    [Fact]
+    public void TEST_RollBackWorks()
+    {
+        User? testUser;
+        string
+            userName = "usertest13";
+        try
+        {
+
+            _fac.SecureTest((conn, trans) =>
+            {
+                User[]
+                    allUsers = _fac._repoUsers.GetAll(conn, trans);
+                Assert.NotEmpty(allUsers);
+                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+                Assert.Null(testUser);
+
+                testUser = _fac._repoUsers.AddByName(userName, conn, trans);
+                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+                Assert.NotNull(testUser);
+            });
+            throw new TestFailureException();
+        }
+        catch (TestFailureException)
+        {
+            _fac.SecureTest((conn, trans) =>
+            {
+                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+                Assert.Null(testUser);
+            });
+        }
+    }
+    [Fact]
+    public void TEST_WhenUserDeleted_CartItemsIsDeleted_CartDeleted()
+    {
+        User? testUser;
+        string
+            userName = "usertest13";
+        try
+        {
+            _fac.SecureTest((conn, trans) =>
+            {
+                User[]
+                    allUsers = _fac._repoUsers.GetAll(conn, trans);
+                Assert.NotEmpty(allUsers);
+                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+                Assert.Null(testUser);
+
+                testUser = _fac._repoUsers.AddByName(userName, conn, trans);
+                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+                Assert.NotNull(testUser);
+            });
+            throw new TestFailureException();
+        }
+        catch (TestFailureException)
+        {
+            _fac.SecureTest((conn, trans) =>
+            {
+                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+                Assert.Null(testUser);
+            });
+        }
+    }
+    private class TestFailureException : Exception { }
 }

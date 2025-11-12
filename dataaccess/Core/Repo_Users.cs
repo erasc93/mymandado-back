@@ -1,4 +1,6 @@
-﻿using core_mandado.Users;
+﻿using core_mandado.Cart;
+using core_mandado.Users;
+using Google.Protobuf.WellKnownTypes;
 using models.tables;
 using Services.Dapper.Interfaces;
 using Services.Repositories.Abstractions;
@@ -7,10 +9,15 @@ using System.Data;
 
 namespace core;
 
-public class Repo_Users(IQueries query) : ARepository(query),
-                                            IRepo_Users,
-                                            IRepo_CREATE<User>, IRepo_READ<User>, IRepo_DELETE<User>, IRepo_UPDATE<User>
+public class Repo_Users : ARepository,
+                          IRepo_Users,
+                          IRepo_CREATE<User>, IRepo_READ<User>, IRepo_DELETE<User>, IRepo_UPDATE<User>
 {
+    private IRepo_CartItems _repo_CartItems { get; init; }
+    public Repo_Users(IQueries query, IRepo_CartItems repo_CartItems) : base(query)
+    {
+        _repo_CartItems = repo_CartItems;
+    }
 
     public bool Login(LoginInfo login)
     {
@@ -19,83 +26,94 @@ public class Repo_Users(IQueries query) : ARepository(query),
     public User GetCurrent()
     {
         User
-            u = new User() { id = 1, name = "manu", role = User.Role.admin };
+            u = new User()
+            {
+                id = 1,
+                name = "manu",
+                role = User.Role.admin
+            };
         return u;
     }
-    public User? GetUserByName(string userName)
+    public User? GetUserByName(string userName, IDbConnection? conn = null, IDbTransaction? trans = null)
     {
         string query;
-        Dictionary<string, object> param;
-
-        param = new Dictionary<string, object>()
+        Dictionary<string, object>
+            param = new Dictionary<string, object>()
                     {
                         {"@username",userName},
                     };
         query = $"select * from USERS where usr_name=@username";
-        MND_USERS[] mndusers = _query.free.Query<MND_USERS>(query, param).ToArray();
-
-        User? output;
-        output = (from u in mndusers
-                  select new User()
-                  {
-                      id = u.usr_id,
-                      name = u.usr_name,
-                      role = u.usr_role,
-                  }
-                  ).FirstOrDefault();
-
+        MND_USERS?
+            mndusers = _query.free.Query<MND_USERS>(query, param, conn, trans)
+            .FirstOrDefault();
+        User?
+            output = mndusers is not null
+                    ? Factory.ToView(mndusers)
+                    : null;
         return output;
     }
-    public User[] GetAll()
+    public User[] GetAll(IDbConnection? conn = null, IDbTransaction? trans = null)
     {
-        MND_USERS[] mndusers;
-        mndusers = _query.crud.GetAll<MND_USERS>().ToArray();
-
-        User[] output;
-        output = (from u in mndusers
-                  select new User() { id = u.usr_id, name = u.usr_name, role = u.usr_role }
+        MND_USERS[]
+            mndusers = _query.crud.GetAll<MND_USERS>(conn, trans);
+        User[]
+            output = (from u in mndusers
+                      select new User()
+                      {
+                          id = u.usr_id,
+                          name = u.usr_name,
+                          role = u.usr_role
+                      }
                   ).ToArray();
-
         return output;
     }
-    public User? AddByName(string userName)
+    public User AddByName(string userName, IDbConnection c, IDbTransaction t)
     {
-        MND_USERS mnduser;
-        MND_CART firstCart;
-        int? userid = null;
-        User? output = null;
 
-        mnduser = new MND_USERS
-        {
-            usr_name = userName,
-            usr_role = User.Role.friend
-        };
+        MND_USERS
+            mnduser = new MND_USERS
+            {
+                usr_name = userName,
+                usr_role = User.Role.friend
+            };
 
-
-
-        _query.ExecuteInTransaction((c, t) =>
-        {
-            userid = _query.crud.Add<MND_USERS>(mnduser, c, t)!;
+        _query.crud.Add<MND_USERS>(ref mnduser, c, t);
+        MND_CART
             firstCart = new MND_CART
             {
                 car_crtnb = 0,
                 car_desc = "",
                 car_name = "cart",
-                car_usrid = (int)userid
+                car_usrid = mnduser.usr_id
             };
-            firstCart.car_usrid = (int)_query.crud.Add<MND_CART>(firstCart,c,t)!;
+        _query.crud.Add<MND_CART>(ref firstCart, c, t);
+        User
             output = new User()
             {
-                id = (int)userid!,
+                id = mnduser.usr_id,
                 name = mnduser.usr_name,
                 role = mnduser.usr_role
             };
-        });
-
 
         return output;
     }
-    public User AddByNameSafe(string userName)
+    public User? AddByName(string userName)
+    {
+        User?
+            output = null;
+
+        _query.ExecuteInTransaction((c, t) =>
+        {
+            output = AddByName(userName, c, t);
+        });
+
+        return output;
+    }
+    private void AddAllProductsToCart(MND_CART cart, IDbConnection c, IDbTransaction t)
+    {
+        _repo_CartItems.AddAll(cart.car_usrid, cart.car_crtnb, c, t);
+    }
+    public User AddByNameSafe(string userName, IDbConnection? conn = null, IDbTransaction? trans = null)
     {
         MND_USERS mnduser;
         int? userid;
@@ -104,15 +122,12 @@ public class Repo_Users(IQueries query) : ARepository(query),
         mnduser = new MND_USERS
         {
             usr_name = userName,
-            usr_role = User.Role.friend
+            usr_role = DEFAULTS.role
         };
-
-
-        userid = _query.crud.Add(mnduser);
-
+        _query.crud.Add(ref mnduser, conn, trans);
         output = new User()
         {
-            id = (int)userid!,
+            id = mnduser.usr_id,
             name = mnduser.usr_name,
             role = mnduser.usr_role
         };
@@ -120,10 +135,10 @@ public class Repo_Users(IQueries query) : ARepository(query),
     }
     public void Add(ref User item)
     {
-        AddByName(item.name);
+        item = AddByName(item.name)!;
     }
 
-    public bool Delete(User user)
+    public bool Delete(User user, IDbConnection? connection = null, IDbTransaction? transaction = null)
     {
         bool success;
         MND_USERS mnduser;
@@ -135,7 +150,7 @@ public class Repo_Users(IQueries query) : ARepository(query),
             usr_role = user.role,
         };
 
-        success = _query.crud.Delete(mnduser);
+        success = _query.crud.Delete(mnduser, connection, transaction);
 
         if (!success)
         {
@@ -165,5 +180,23 @@ public class Repo_Users(IQueries query) : ARepository(query),
             msg = $"Mise à jour impossible de l'utilisateur {updated.name} impossible";
             throw new Exception(msg);
         }
+    }
+    private static class Factory
+    {
+        public static User ToView(MND_USERS u)
+        {
+            User
+                output = new User()
+                {
+                    id = u.usr_id,
+                    name = u.usr_name,
+                    role = u.usr_role
+                };
+            return output;
+        }
+    }
+    private static class DEFAULTS
+    {
+        public const User.Role role = User.Role.friend;
     }
 }

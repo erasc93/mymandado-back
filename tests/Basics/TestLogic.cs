@@ -68,7 +68,7 @@ public class TestLogic : IClassFixture<MymandadoWebAppFactory>
 
         all= _repoDBProducts.GetAll();
         Assert.DoesNotContain(all,x => x.prd_name == notHere);
-        _repoDBProducts.Add(ref p);
+        _repoDBProducts.Add(ref  p);
 
         all= _repoDBProducts.GetAll();
         p = all.Where(x => x.prd_name == notHere).FirstOrDefault();
