@@ -10,22 +10,19 @@ namespace api_mandado.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CartItemsController : ControllerBase
+public class CartItemsController(
+        IRepo_CartItems _cartitemsRepository,
+        IRepo_Users _repoUser,
+        IRepo_Cart _repoCart,
+        ClaimsAccessor _svc_context
+    ) : ControllerBase
 {
-    private IRepo_CartItems _cartitemsRepository { get; init; }
-    private IRepo_Users _repoUser { get; init; }
-    private ClaimsAccessor _svc_context { get; set; }
-    private string _username { get; set; }
-    public CartItemsController(
-        IRepo_CartItems cartitemsRepo, IRepo_Users repoUser,
-        ClaimsAccessor svc_context
-        )
-    {
-        _cartitemsRepository = cartitemsRepo;
-        _repoUser = repoUser;
-        _svc_context = svc_context;
-        _username = _svc_context.GetUsername();
-    }
+    //private IRepo_CartItems _cartitemsRepository { get; init; }
+    //private IRepo_Users _repoUser { get; init; }
+    //private ClaimsAccessor _svc_context { get; set; }
+    //private string _username { get; set; }
+    private string _username { get; init; } = _svc_context.GetUsername();
+    
     // GET: api/<CartItemsController>
     [HttpGet]
     [Authorize]
@@ -43,8 +40,10 @@ public class CartItemsController : ControllerBase
     public ActionResult<CartItem> Post(int cartNumber, CartItem value)
     {
         //TODO: Get User from session guid
-        User user = _repoUser.GetCurrent();
-        _cartitemsRepository.Add(cartNumber, ref value, user);
+        User
+            user = _repoUser.GetCurrent();
+        //_repoCart.Add
+        _cartitemsRepository.AddItem(user, cartNumber, ref value);
         return value;
     }
 
@@ -52,7 +51,7 @@ public class CartItemsController : ControllerBase
     public void Put(int cartNumber, CartItem value)
     {
         User user = _repoUser.GetCurrent();
-        _cartitemsRepository.Update(cartNumber, value, user);
+        _cartitemsRepository.Update(user,cartNumber, value);
     }
 
     [HttpDelete("{id}")]

@@ -4,12 +4,20 @@ using core_mandado.Products;
 using core_mandado.Users;
 using models.tables;
 using Services.Dapper.Interfaces;
+using Services.Repositories;
 using Services.Repositories.Abstractions;
 using System.Data;
 
 namespace core;
 
-public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
+public class Repo_Cart(IQueries queries,
+                            IRepo_CartItems _repoCartItems,
+                            IRepo_Products _repoProducts,
+                            Repo_AnyTable<MND_CART_ITEM> _CRT_ITEMS,
+                            Repo_AnyTable<MND_USERS> _repoUsers,
+                            Repo_AnyTable<MND_PRODUCT> _PRDODUCTS
+
+    ) : ARepository(queries), IRepo_Cart
 {
     private const string DESC = "";
     private const string NAME = "cart";
@@ -53,12 +61,45 @@ public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
         return output;
     }
 
-    public void Remove(Cart newCart, IDbConnection? conn, IDbTransaction? trans)
+    public Cart? GetBy(User user, int cardId, IDbConnection? connect = null, IDbTransaction? transact = null)
     {
-        MND_CART mndcart = Factory.FromView(newCart);
+        Cart? output = null;
+
+        MND_CART?
+            mnd_carts = QueryCART(user, cardId, connect, transact);
+        MND_CART_ITEM[]
+            mnd_cartitems = QueryCART_ITEMS(user, cardId, connect, transact);
+        MND_PRODUCT[]
+            products = QueryItemsPRODUCTS(mnd_cartitems, connect, transact);
+
+        //output = new Cart[mnd_carts.Length];
+        //for (int i = 0; i < mnd_carts.Length; i++)
+        //{
+        if (mnd_carts != null)
+        {
+            output = Factory.BuildCart(mnd_carts, mnd_cartitems, products);
+        }
+        //}
+
+        return output;
+    }
+
+    public void Remove(Cart cart, IDbConnection? conn, IDbTransaction? trans)
+    {
+        MND_CART mndcart = Factory.FromView(cart);
         if (!_query.crud.Delete<MND_CART>(mndcart, conn, trans))
         {
-            throw new Exception($"cart no {newCart.numero}, for user : {newCart.userid} could not be deleted;");
+            throw new Exception($"cart no {cart.numero}, for user : {cart.userid} could not be deleted;");
+        }
+    }
+
+    public void Update(User user, Cart newCart, IDbConnection? conn = null, IDbTransaction? trans = null)
+    {
+        MND_CART? cart = QueryCART(user, newCart.id, conn, trans);
+        if (cart != null)
+        {
+            cart = Factory.FromView(newCart);
+            _query.crud.Update<MND_CART>(cart, conn, trans);
         }
     }
 
@@ -73,7 +114,36 @@ public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
                                 .ToArray();
         return mnd_carts;
     }
-    private MND_CART_ITEM[] QueryCART_ITEMS(User user, IDbConnection connect, IDbTransaction transact)
+    private MND_CART? QueryCART(User user, int id, IDbConnection? connect = null, IDbTransaction? transact = null)
+    {
+        Dictionary<string, object>
+            param = new() {
+                { "@car_usrid", user.id } ,
+                { "@car_id", id } ,
+            };
+        string
+            query = "SELECT * FROM  CART WHERE car_id=@car_id AND car_usrid=@car_usrid;";
+        MND_CART?
+            mnd_carts = _query.free.Query<MND_CART>(query, param, connect, transact).First();
+
+        return mnd_carts;
+    }
+    private MND_CART_ITEM[] QueryCART_ITEMS(User user, int crtnb, IDbConnection? connect = null, IDbTransaction? transact = null)
+    {
+        Dictionary<string, object>
+            param = new() {
+                { "@car_usrid", user.id },
+                { "@car_crtnb", crtnb },
+            };
+        string
+        query = "SELECT * from CART_ITEMS WHERE crt_usrid=@car_usrid AND crt_crtnb=@car_crtnb;";
+        MND_CART_ITEM[]
+            mnd_cartitems = _query.free.Query<MND_CART_ITEM>(query, param, connect, transact)
+                                        .DistinctBy(item => (item.crt_crtnb, item.crt_prdid))
+                                        .ToArray();
+        return mnd_cartitems;
+    }
+    private MND_CART_ITEM[] QueryCART_ITEMS(User user, IDbConnection? connect = null, IDbTransaction? transact = null)
     {
         Dictionary<string, object>
             param = new() { { "@car_usrid", user.id }, };
@@ -85,7 +155,7 @@ public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
                                         .ToArray();
         return mnd_cartitems;
     }
-    private MND_PRODUCT[] QueryItemsPRODUCTS(MND_CART_ITEM[] mnd_cartitems, IDbConnection connect, IDbTransaction transact)
+    private MND_PRODUCT[] QueryItemsPRODUCTS(MND_CART_ITEM[] mnd_cartitems, IDbConnection? connect = null, IDbTransaction? transact = null)
     {
         Dictionary<string, object>
             param = new(){
@@ -101,6 +171,42 @@ public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
                            .ToArray();
         return output;
     }
+
+    //public CartItem AddProduct(User user, Cart cart, Product product, int qtt, bool isdone, IDbConnection conn, IDbTransaction trans)
+    //{
+    //    return _repoCartItems.AddProduct(user, cart, product, conn, trans);
+    //}
+    public CartItem AddProduct(User user, int cartnumber, Product product, int qtt, bool isdone = false, IDbConnection? conn = null, IDbTransaction? transac = null)
+    //public CartItem AddProduct(User user, int cartnumber, Product product, IDbConnection? conn = null, IDbTransaction? transac = null)
+    {
+        CartItem output;
+        MND_CART_ITEM item;
+        //Product prd;
+
+        bool itemExists = product.id != APP_PARAMS.instance.UNDEFINED;
+        if (!itemExists)
+        {
+            _repoProducts.Add(ref product, conn, transac);
+        }
+
+        item = Repo_CartItems.Factory.ToCART_ITEMS(user, cartnumber, product, qtt, isdone);
+        _CRT_ITEMS.Add(ref item, conn, transac);
+
+        output = Repo_CartItems.Factory.ToView(item, product);
+        return output;
+    }
+    public void AddAll(int userid, int cartnumber, IDbConnection? c = null, IDbTransaction? t = null)
+    {
+
+        MND_PRODUCT[]
+            products = _PRDODUCTS.GetAll(c, t);
+        MND_CART_ITEM[]
+            newitems = Repo_CartItems.Factory.ToCART_ITEMS(userid, cartnumber, products, isdone: false);
+        //foreach(newitems)
+        _CRT_ITEMS.Add(ref newitems, c, t);
+    }
+
+ 
     private static class Factory
     {
         public static Cart FillRAW(MND_CART car, MND_CART_ITEM[] mnd_cartitems, MND_PRODUCT[] products)
@@ -167,16 +273,14 @@ public class Repo_Cart(IQueries queries) : ARepository(queries), IRepo_Cart
 
         internal static MND_CART FromView(Cart cart)
         {
-            MND_CART output = new MND_CART()
+            return new MND_CART()
             {
                 car_id = cart.id,
                 car_crtnb = cart.numero,
                 car_desc = cart.description,
                 car_name = cart.name,
                 car_usrid = cart.userid,
-
             };
-            return output;
         }
 
 

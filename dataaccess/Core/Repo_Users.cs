@@ -102,10 +102,7 @@ public class Repo_Users(
 
         return output;
     }
-    private void AddAllProductsToCart(MND_CART cart, IDbConnection c, IDbTransaction t)
-    {
-        _repo_CartItems.AddAll(cart.car_usrid, cart.car_crtnb, c, t);
-    }
+    
     public User AddByNameSafe(string userName, IDbConnection? conn = null, IDbTransaction? trans = null)
     {
         MND_USERS mnduser;
