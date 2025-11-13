@@ -11,6 +11,6 @@ public interface IQueries
     public IFreeQueryAsync freeAsync { get; }
     public ICRUDAsync crudAsync { get; }
     public IBulkAsync bulkAsync { get; }
-    void ExecuteInTransaction(Action action);
+    void ExecuteInTransaction(Action action,bool immediatRollback=false);
 
 }

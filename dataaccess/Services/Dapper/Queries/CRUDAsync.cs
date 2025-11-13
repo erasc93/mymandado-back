@@ -1,5 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 using MySql.Data.MySqlClient;
+using Services.Dapper.DBWire;
 using Services.Dapper.Interfaces;
 using System.Data;
 
@@ -11,7 +12,7 @@ public class CRUDAsync(IConnectionInformation_DB _credentialDatabase, ITransacti
     {
         int? id;
         bool
-            useOwnConnection = _transacHandle.UseOwnConnection;
+            useOwnConnection = _transacHandle.isConnectionClosed;
 
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
@@ -23,7 +24,7 @@ public class CRUDAsync(IConnectionInformation_DB _credentialDatabase, ITransacti
     {
         using IDbConnection connection = new MySqlConnection(_credentialDatabase.ConnectionString);
         bool output,
-                    useOwnConnection = _transacHandle.UseOwnConnection;
+                    useOwnConnection = _transacHandle.isConnectionClosed;
 
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
@@ -35,7 +36,7 @@ public class CRUDAsync(IConnectionInformation_DB _credentialDatabase, ITransacti
     {
         bool
             output,
-            useOwnConnection = _transacHandle.UseOwnConnection;
+            useOwnConnection = _transacHandle.isConnectionClosed;
 
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
@@ -47,7 +48,7 @@ public class CRUDAsync(IConnectionInformation_DB _credentialDatabase, ITransacti
     {
         IEnumerable<T> output;
         bool
-            useOwnConnection = _transacHandle.UseOwnConnection;
+            useOwnConnection = _transacHandle.isConnectionClosed;
 
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
@@ -61,7 +62,7 @@ public class CRUDAsync(IConnectionInformation_DB _credentialDatabase, ITransacti
         T?
             output;
         bool
-            useOwnConnection = _transacHandle.UseOwnConnection;
+            useOwnConnection = _transacHandle.isConnectionClosed;
 
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }

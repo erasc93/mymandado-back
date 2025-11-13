@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Services.Dapper;
+using Services.Dapper.DBWire;
 using Services.Dapper.Interfaces;
 using Services.Dapper.Queries;
 using Services.Repositories;

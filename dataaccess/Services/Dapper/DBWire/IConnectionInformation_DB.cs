@@ -1,4 +1,4 @@
-﻿namespace Services.Dapper;
+﻿namespace Services.Dapper.DBWire;
 
 public interface IConnectionInformation_DBSafe
 {

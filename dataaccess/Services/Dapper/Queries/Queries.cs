@@ -1,6 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
+using Services.Dapper.DBWire;
 using Services.Dapper.Interfaces;
 using System.Data;
+using System.Diagnostics.Eventing.Reader;
 
 namespace Services.Dapper.Queries;
 public class Queries(
@@ -16,13 +18,21 @@ public class Queries(
     public IFreeQueryAsync freeAsync { get; } = freeAsync;
     public ICRUDAsync crudAsync { get; } = crudAsync;
     public IBulkAsync bulkAsync { get; } = bulkAsync;
-    public void ExecuteInTransaction(Action action)
+    public void ExecuteInTransaction(Action action, bool immediatRollback = false)
     {
         _transacHandle.OpenConnectionBeginTransaction();
         try
         {
             action();
-            _transacHandle.transaction!.Commit();
+
+            if (immediatRollback)
+            {
+                _transacHandle.transaction.Rollback();
+            }
+            else
+            {
+                _transacHandle.transaction.Commit();
+            }
         }
         catch (Exception e)
         {
@@ -31,10 +41,13 @@ public class Queries(
                 throw new RollBackException("RollBack could not perform ");
             }
             _transacHandle.transaction.Rollback();
-            throw new RollBackException("An exception ocurred, rollback was performed correctly ! ", e);
+            throw new RollBackException(e.Message+"\n An exception ocurred, rollback was performed correctly ! ", e);
+        }
+        finally
+        {
+            _transacHandle.Close();
         }
     }
-
 
     public class RollBackException : Exception
     {

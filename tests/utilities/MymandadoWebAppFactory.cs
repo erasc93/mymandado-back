@@ -8,6 +8,7 @@ using core_mandado.Products;
 using core_mandado.Users;
 using Microsoft.Extensions.DependencyInjection;
 using models.tables;
+using Services.Dapper.DBWire;
 using Services.Dapper.Interfaces;
 using Services.Dapper.Queries;
 using Services.Repositories;
@@ -29,9 +30,13 @@ public class MymandadoWebAppFactory : ACustomWebApplicationFactory
     public readonly IRepo_Products _repoProducts;
     public readonly IRepo_Cart _repoCart;
     public readonly IRepo_CartItems _repoCartItems;
+
+    private readonly ITransactionHandle _handle;
     public MymandadoWebAppFactory()
     {
         using var scope = this.Services.CreateScope();
+
+        _handle = Svc<ITransactionHandle>(scope);
         _queries = Svc<IQueries>(scope)!;
 
         _repoUsers = Svc<IRepo_Users>(scope)!;
@@ -62,13 +67,15 @@ public class MymandadoWebAppFactory : ACustomWebApplicationFactory
 
     public void SecureTest(Action testfunction)
     {
-        Assert.Throws<Success>(
-            () => _queries.ExecuteInTransaction(() =>
-                    {
-                        testfunction();
-                        throw new Success();
-                    })
-        );
+        _queries.ExecuteInTransaction(() =>
+        {
+            testfunction();
+            if (_handle.transaction is null)
+            {
+                throw new Exception("Handle was deleted before the end");
+            }
+
+        }, immediatRollback: true);
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MySql.Data.MySqlClient;
+using Services.Dapper.DBWire;
 using Services.Dapper.Interfaces;
 using System.Data;
 
@@ -18,7 +19,7 @@ public class FreeQueryAsync(IConnectionInformation_DB _credentialDatabase, ITran
         : new DynamicParameters(param);
 
         bool
-            useOwnConnection = _transacHandle.UseOwnConnection;
+            useOwnConnection = _transacHandle.isConnectionClosed;
 
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
@@ -35,7 +36,7 @@ public class FreeQueryAsync(IConnectionInformation_DB _credentialDatabase, ITran
             ? null
             : new DynamicParameters(param);
         bool
-            useOwnConnection = _transacHandle.UseOwnConnection;
+            useOwnConnection = _transacHandle.isConnectionClosed;
 
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }

@@ -1,4 +1,4 @@
-﻿namespace Services.Dapper;
+﻿namespace Services.Dapper.DBWire;
 
 public class ConnectionInformation_DB(string _connectionString) : IConnectionInformation_DB
 {

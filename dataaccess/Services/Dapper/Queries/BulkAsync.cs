@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using Services.Dapper.DBWire;
 using Services.Dapper.Interfaces;
 using System.Data;
 using Z.Dapper.Plus;

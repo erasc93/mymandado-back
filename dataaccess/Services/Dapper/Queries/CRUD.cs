@@ -1,5 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 using MySql.Data.MySqlClient;
+using Services.Dapper.DBWire;
 using Services.Dapper.Interfaces;
 using System.Data;
 
@@ -12,7 +13,7 @@ public class CRUD(IConnectionInformation_DB _credentialDatabase, ITransactionHan
     {
         int id;
         bool
-            useOwnConnection = _transacHandle.UseOwnConnection;
+            useOwnConnection = _transacHandle.isConnectionClosed;
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
 
         if (useOwnConnection) { conn.Open(); }
@@ -27,7 +28,7 @@ public class CRUD(IConnectionInformation_DB _credentialDatabase, ITransactionHan
     {
         int id;
         bool
-            useOwnConnection = _transacHandle.UseOwnConnection;
+            useOwnConnection = _transacHandle.isConnectionClosed;
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
 
         if (useOwnConnection) { conn.Open(); }
@@ -39,7 +40,7 @@ public class CRUD(IConnectionInformation_DB _credentialDatabase, ITransactionHan
     public bool Update<T>(T entityToUpdate) where T : class
     {
         bool
-            useOwnConnection = _transacHandle.UseOwnConnection,
+            useOwnConnection = _transacHandle.isConnectionClosed,
             success;
 
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
@@ -51,7 +52,7 @@ public class CRUD(IConnectionInformation_DB _credentialDatabase, ITransactionHan
     public bool Delete<T>(T entityToUpdate) where T : class
     {
         bool
-            useOwnConnection = _transacHandle.UseOwnConnection,
+            useOwnConnection = _transacHandle.isConnectionClosed,
             success;
 
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
@@ -64,7 +65,7 @@ public class CRUD(IConnectionInformation_DB _credentialDatabase, ITransactionHan
     {
         IEnumerable<T> output;
         bool
-        useOwnConnection = _transacHandle.UseOwnConnection;
+        useOwnConnection = _transacHandle.isConnectionClosed;
 
         IDbConnection
             conn = (useOwnConnection)
@@ -81,7 +82,7 @@ public class CRUD(IConnectionInformation_DB _credentialDatabase, ITransactionHan
     {
         T? output;
         bool
-            useOwnConnection = _transacHandle.UseOwnConnection;
+            useOwnConnection = _transacHandle.isConnectionClosed;
 
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
