@@ -125,6 +125,7 @@ public sealed class DI_Services
         }
         services.AddSingleton<IConnectionInformation_DB>(new ConnectionInformation_DB(connectionString));
 
+        services.AddScoped<ITransactionHandle, TransactionHandle>();
         services.AddScoped<IQueries, Queries>();
 
         services.AddScoped<ICRUD, CRUD>();

@@ -1,4 +1,6 @@
-﻿namespace Services.Repositories.Interfaces;
+﻿using System.Data;
+
+namespace Services.Repositories.Interfaces;
 
 public interface IRepo_CREATE<T>
 {

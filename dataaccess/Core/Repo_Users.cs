@@ -11,11 +11,9 @@ namespace core;
 
 public class Repo_Users(
                             IQueries query,
-                            IRepo_Cart _repoCart,
-                            IRepo_CartItems _repo_CartItems
-                        ) : ARepository(query),
-                          IRepo_Users,
-                          IRepo_CREATE<User>, IRepo_READ<User>, IRepo_DELETE<User>, IRepo_UPDATE<User>
+                            IRepo_Cart _repoCart
+                        ) : ARepository(query), IRepo_CREATE<User>, IRepo_READ<User>, IRepo_DELETE<User>, IRepo_UPDATE<User>,
+                            IRepo_Users
 {
     public bool Login(LoginInfo login)
     {
@@ -32,7 +30,7 @@ public class Repo_Users(
             };
         return u;
     }
-    public User? GetUserByName(string userName, IDbConnection? conn = null, IDbTransaction? trans = null)
+    public User? GetUserByName(string userName)
     {
         string query;
         Dictionary<string, object>
@@ -42,7 +40,7 @@ public class Repo_Users(
                     };
         query = $"select * from USERS where usr_name=@username";
         MND_USERS?
-            mndusers = _query.free.Query<MND_USERS>(query, param, conn, trans)
+            mndusers = _query.free.Query<MND_USERS>(query, param)
             .FirstOrDefault();
         User?
             output = mndusers is not null
@@ -50,10 +48,10 @@ public class Repo_Users(
                     : null;
         return output;
     }
-    public User[] GetAll(IDbConnection? conn = null, IDbTransaction? trans = null)
+    public User[] GetAll()
     {
         MND_USERS[]
-            mndusers = _query.crud.GetAll<MND_USERS>(conn, trans);
+            mndusers = _query.crud.GetAll<MND_USERS>();
         User[]
             output = (from u in mndusers
                       select new User()
@@ -65,7 +63,7 @@ public class Repo_Users(
                   ).ToArray();
         return output;
     }
-    public User AddByName(string userName, IDbConnection c, IDbTransaction t)
+    public User AddByName(string userName)
     {
 
         MND_USERS
@@ -74,7 +72,7 @@ public class Repo_Users(
                 usr_name = userName,
                 usr_role = User.Role.friend
             };
-        _query.crud.Add<MND_USERS>(ref mnduser, c, t);
+        _query.crud.Add<MND_USERS>(ref mnduser);
 
         User
             output = new User()
@@ -85,25 +83,13 @@ public class Repo_Users(
             };
 
 
-        Cart cart = _repoCart.AddNew(output,0,c, t);
+        Cart cart = _repoCart.AddNew(output, 0);
 
         return output;
     }
-    //private
-    public User? AddByName(string userName)
-    {
-        User?
-            output = null;
 
-        _query.ExecuteInTransaction((c, t) =>
-        {
-            output = AddByName(userName, c, t);
-        });
 
-        return output;
-    }
-    
-    public User AddByNameSafe(string userName, IDbConnection? conn = null, IDbTransaction? trans = null)
+    public User AddByNameSafe(string userName)
     {
         MND_USERS mnduser;
         int? userid;
@@ -114,7 +100,7 @@ public class Repo_Users(
             usr_name = userName,
             usr_role = DEFAULTS.role
         };
-        _query.crud.Add(ref mnduser, conn, trans);
+        _query.crud.Add(ref mnduser);
         output = new User()
         {
             id = mnduser.usr_id,
@@ -125,14 +111,10 @@ public class Repo_Users(
     }
     public void Add(ref User item)
     {
-        item = AddByName(item.name)!;
-    }
-    public void Add(ref User item, IDbConnection conn , IDbTransaction trans )
-    {
-        item = AddByName(item.name,conn,trans);
+        item = AddByName(item.name);
     }
 
-    public bool Delete(User user, IDbConnection? connection = null, IDbTransaction? transaction = null)
+    public bool Delete(User user)
     {
         bool success;
         MND_USERS mnduser;
@@ -144,7 +126,7 @@ public class Repo_Users(
             usr_role = user.role,
         };
 
-        success = _query.crud.Delete(mnduser, connection, transaction);
+        success = _query.crud.Delete(mnduser);
 
         if (!success)
         {

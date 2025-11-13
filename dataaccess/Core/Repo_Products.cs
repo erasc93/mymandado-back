@@ -12,20 +12,20 @@ public class Repo_Products(
                             ) : ARepository(query), IRepo_Products
 {
 
-    public Product[] GetAll(IDbConnection? connection = null, IDbTransaction? transaction = null)
+    public Product[] GetAll()
     {
         Product[]
-            output = (from p in _repo_PRD.GetAll(connection, transaction)
+            output = (from p in _repo_PRD.GetAll()
                       select Factory.ToView(p))
                       .ToArray();
         return output;
     }
-    public Product? GetById(int id, IDbConnection? connection = null, IDbTransaction? transaction = null)
+    public Product? GetById(int id)
     {
         Product?
             output = null;
         MND_PRODUCT?
-            prd = _repo_PRD.GetById(id, connection, transaction)!;
+            prd = _repo_PRD.GetById(id)!;
 
         if (prd is not null)
         {
@@ -34,14 +34,14 @@ public class Repo_Products(
         return output;
     }
 
-    public void Add(ref Product product, IDbConnection? conn = null, IDbTransaction? trans = null)
+    public void Add(ref Product product)
     {
         MND_PRODUCT
             prod = Factory.FromView(product);
-        _repo_PRD.Add(ref prod, conn, trans);
+        _repo_PRD.Add(ref prod);
         product.id = prod.prd_id;
     }
-    public void RemoveItem(int id, IDbConnection? conn = null, IDbTransaction? transac = null)
+    public void RemoveItem(int id)
     {
 
         //string sql;
@@ -49,8 +49,8 @@ public class Repo_Products(
 
         //MND_PRODUCT p = new MND_PRODUCT() { prd_id = id, prd_name = "fuck" };
         MND_PRODUCT
-            prd = _query.crud.GetById<MND_PRODUCT>(id, conn, transac)!;
-        bool success = _query.crud.Delete(prd, conn, transac);
+            prd = _query.crud.GetById<MND_PRODUCT>(id)!;
+        bool success = _query.crud.Delete(prd);
 
         if (!success)
         {
@@ -60,11 +60,11 @@ public class Repo_Products(
         }
     }
 
-    public void Update(Product value, IDbConnection? conn = null, IDbTransaction? transac = null)
+    public void Update(Product value)
     {
         MND_PRODUCT
             p = Factory.FromView(value);
-        _repo_PRD.Update(p, conn, transac);
+        _repo_PRD.Update(p);
     }
 
 

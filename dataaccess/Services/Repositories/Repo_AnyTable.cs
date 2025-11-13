@@ -7,34 +7,34 @@ namespace Services.Repositories;
 
 public class Repo_AnyTable<T>(IQueries query) : ARepository(query) where T : class, IDbTable
 {
-    public T? GetById(int id, IDbConnection? conn = null, IDbTransaction? transaction = null)
+    public T? GetById(int id)
     {
-        return _query.crud.GetById<T>(id,conn,transaction);
+        return _query.crud.GetById<T>(id);
     }
-    public T[] GetAll(IDbConnection? conn = null, IDbTransaction? transaction = null)
+    public T[] GetAll()
     {
         T[] output;
-        output = _query.crud.GetAll<T>(conn, transaction);
+        output = _query.crud.GetAll<T>();
         return output;
     }
 
     /// <summary>item id is already updated </summary>
     /// <returns>id of created element</returns>
-    public int Add(ref T item, IDbConnection? conn = null, IDbTransaction? transaction = null)
+    public int Add(ref T item)
     {
-        int o = _query.crud.Add(ref item, conn, transaction);
+        int o = _query.crud.Add(ref item);
         return o;
     }
-    public int Add(ref T[] item, IDbConnection c, IDbTransaction t)
+    public int Add(ref T[] item)
     {
-        return _query.crud.Add(ref item, c, t);
+        return _query.crud.Add(ref item);
     }
 
-    public bool Delete(T item, IDbConnection? conn = null, IDbTransaction? transaction = null)
+    public bool Delete(T item)
     {
         bool success;
 
-        success = _query.crud.Delete(item, conn, transaction);
+        success = _query.crud.Delete(item);
 
         if (!success)
         {
@@ -44,10 +44,10 @@ public class Repo_AnyTable<T>(IQueries query) : ARepository(query) where T : cla
         }
         return success;
     }
-    public void Update(T updated, IDbConnection? conn = null, IDbTransaction? transaction = null)
+    public void Update(T updated)
     {
         bool success;
-        success = _query.crud.Update(updated, conn, transaction);
+        success = _query.crud.Update(updated);
 
         if (!success)
         {

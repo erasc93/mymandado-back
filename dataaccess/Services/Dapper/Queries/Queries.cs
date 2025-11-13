@@ -3,46 +3,44 @@ using Services.Dapper.Interfaces;
 using System.Data;
 
 namespace Services.Dapper.Queries;
-
-public class Queries : IQueries
-{
-    private IConnectionInformation_DB _credentialDatabase { get; init; }
-    public Queries(IConnectionInformation_DB credentials,
+public class Queries(
         IFreeQuery free, ICRUD crud, IBulk bulk,
-        IFreeQueryAsync freeAsync, ICRUDAsync crudAsync, IBulkAsync bulkAsync)
-    {
-        _credentialDatabase = credentials;
-        this.free = free;
-        this.crud = crud;
-        this.bulk = bulk;
-        this.freeAsync = freeAsync;
-        this.crudAsync = crudAsync;
-        this.bulkAsync = bulkAsync;
-    }
+        IFreeQueryAsync freeAsync, ICRUDAsync crudAsync, IBulkAsync bulkAsync,
+        ITransactionHandle _transacHandle
+        ) : IQueries
+{
+    public IFreeQuery free { get; } = free;
+    public ICRUD crud { get; } = crud;
+    public IBulk bulk { get; } = bulk;
 
-    public IFreeQuery free { get; private set; }
-    public ICRUD crud { get; private set; }
-    public IBulk bulk { get; private set; }
-
-    public IFreeQueryAsync freeAsync { get; private set; }
-    public ICRUDAsync crudAsync { get; private set; }
-    public IBulkAsync bulkAsync { get; private set; }
-    public void ExecuteInTransaction(Action<IDbConnection, IDbTransaction> action)
+    public IFreeQueryAsync freeAsync { get; } = freeAsync;
+    public ICRUDAsync crudAsync { get; } = crudAsync;
+    public IBulkAsync bulkAsync { get; } = bulkAsync;
+    public void ExecuteInTransaction(Action action)
     {
-        using IDbConnection 
-            conn = new MySqlConnection(_credentialDatabase.ConnectionString);
-        conn.Open();
-        using IDbTransaction 
-            transaction = conn.BeginTransaction();
+        _transacHandle.OpenConnectionBeginTransaction();
         try
         {
-            action(conn, transaction);
-            transaction.Commit();
+            action();
+            _transacHandle.transaction!.Commit();
         }
-        catch
+        catch (Exception e)
         {
-            transaction.Rollback();
-            throw;
+            if (_transacHandle.transaction is null)
+            {
+                throw new RollBackException("RollBack could not perform ");
+            }
+            _transacHandle.transaction.Rollback();
+            throw new RollBackException("An exception ocurred, rollback was performed correctly ! ", e);
         }
     }
+
+
+    public class RollBackException : Exception
+    {
+        public RollBackException() : base() { }
+        public RollBackException(string msg) : base(msg) { }
+        public RollBackException(string msg, Exception innerException) : base(msg, innerException) { }
+    }
 }
+

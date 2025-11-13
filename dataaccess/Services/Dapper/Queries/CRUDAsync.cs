@@ -5,74 +5,67 @@ using System.Data;
 
 namespace Services.Dapper.Queries;
 
-public class CRUDAsync : ICRUDAsync
+public class CRUDAsync(IConnectionInformation_DB _credentialDatabase, ITransactionHandle _transacHandle) : ICRUDAsync
 {
-    private IConnectionInformation_DB _credentialDatabase;
-
-    public CRUDAsync(IConnectionInformation_DB credentialDatabase)
-    {
-        _credentialDatabase = credentialDatabase;
-    }
-
-    public async Task<int?> Add<T>(T entityToInsert, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
+    public async Task<int?> Add<T>(T entityToInsert) where T : class
     {
         int? id;
         bool
-            useOwnConnection = conn is null;
+            useOwnConnection = _transacHandle.UseOwnConnection;
 
-        conn ??= new MySqlConnection(_credentialDatabase.ConnectionString);
+        IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
-        id = await conn.InsertAsync(entityToInsert, transaction);
+        id = await conn.InsertAsync(entityToInsert, _transacHandle.transaction);
         if (useOwnConnection) { conn.Close(); }
         return id;
     }
-    public async Task<bool> Update<T>(T entityToUpdate, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
+    public async Task<bool> Update<T>(T entityToUpdate) where T : class
     {
         using IDbConnection connection = new MySqlConnection(_credentialDatabase.ConnectionString);
         bool output,
-                    useOwnConnection = conn is null;
+                    useOwnConnection = _transacHandle.UseOwnConnection;
 
-        conn ??= new MySqlConnection(_credentialDatabase.ConnectionString);
+        IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
-        output = await connection.UpdateAsync(entityToUpdate, transaction);
+        output = await connection.UpdateAsync(entityToUpdate, _transacHandle.transaction);
         if (useOwnConnection) { conn.Close(); }
         return output;
     }
-    public async Task<bool> Delete<T>(T entityToUpdate, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
+    public async Task<bool> Delete<T>(T entityToUpdate) where T : class
     {
         bool
             output,
-            useOwnConnection = conn is null;
+            useOwnConnection = _transacHandle.UseOwnConnection;
 
-        conn ??= new MySqlConnection(_credentialDatabase.ConnectionString);
+        IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
-        output = await conn.DeleteAsync(entityToUpdate, transaction);
+        output = await conn.DeleteAsync(entityToUpdate, _transacHandle.transaction);
         if (useOwnConnection) { conn.Close(); }
         return output;
     }
-    public async Task<T[]> GetAll<T>(IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
+    public async Task<T[]> GetAll<T>() where T : class
     {
         IEnumerable<T> output;
         bool
-            useOwnConnection = conn is null;
+            useOwnConnection = _transacHandle.UseOwnConnection;
 
-        conn ??= new MySqlConnection(_credentialDatabase.ConnectionString);
+        IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
-        output = await conn.GetAllAsync<T>(transaction);
+        output = await conn.GetAllAsync<T>(_transacHandle.transaction);
         if (useOwnConnection) { conn.Close(); }
 
         return output.ToArray();
     }
-    public async Task<T?> GetById<T>(int id, IDbConnection? conn = null, IDbTransaction? transaction = null) where T : class
+    public async Task<T?> GetById<T>(int id) where T : class
     {
         T?
             output;
         bool
-            useOwnConnection = conn is null;
+            useOwnConnection = _transacHandle.UseOwnConnection;
 
-        conn ??= new MySqlConnection(_credentialDatabase.ConnectionString);
+        IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
-        output = await conn.GetAsync<T>(id, transaction);
+        output = await conn.GetAsync<T>(id, _transacHandle.transaction);
         if (useOwnConnection) { conn.Close(); }
         return output;
     }

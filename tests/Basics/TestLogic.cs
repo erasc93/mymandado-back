@@ -21,47 +21,47 @@ public class TestLogic(MymandadoWebAppFactory _fac) : IClassFixture<MymandadoWeb
     [Fact]
     public void UserCRUD()
     {
-        _fac.SecureTest((c, t) =>
+        _fac.SecureTest(() =>
         {
 
-            User[] allUsers = _fac._repoUsers.GetAll(c, t);
+            User[] allUsers = _fac._repoUsers.GetAll();
             Assert.NotEmpty(allUsers);
 
             string userName = "usertest";
             User? u;
-            u = _fac._repoUsers.GetUserByName(userName, c, t);
+            u = _fac._repoUsers.GetUserByName(userName);
             Assert.Null(u);
 
-            u = _fac._repoUsers.AddByName(userName, c, t);
-            u = _fac._repoUsers.GetUserByName(userName, c, t);
+            u = _fac._repoUsers.AddByName(userName);
+            u = _fac._repoUsers.GetUserByName(userName);
             Assert.NotNull(u);
 
-            _fac._repoUsers.Delete(u, c, t);
-            u = _fac._repoUsers.GetUserByName(userName, c, t);
+            _fac._repoUsers.Delete(u);
+            u = _fac._repoUsers.GetUserByName(userName);
             Assert.Null(u);
         });
     }
     [Fact]
     public void TABLE_CRUD()
     {
-        _fac.SecureTest((c, t) =>
+        _fac.SecureTest(() =>
         {
             MND_PRODUCT[] all;
-            all = _fac._repoDBProducts.GetAll(c,t);
+            all = _fac._repoDBProducts.GetAll();
 
             string notHere = "nothere";
             MND_PRODUCT? p = new MND_PRODUCT() { prd_name = notHere };
 
-            all = _fac._repoDBProducts.GetAll(c,t);
+            all = _fac._repoDBProducts.GetAll();
             Assert.DoesNotContain(all, x => x.prd_name == notHere);
-            _fac._repoDBProducts.Add(ref p,c,t);
+            _fac._repoDBProducts.Add(ref p);
 
-            all = _fac._repoDBProducts.GetAll(c, t);
+            all = _fac._repoDBProducts.GetAll();
             p = all.Where(x => x.prd_name == notHere).FirstOrDefault();
             Assert.Contains(all, x => x.prd_id == p.prd_id); // id KEY
 
-            _fac._repoDBProducts.Delete(p,c,t);
-            all = _fac._repoDBProducts.GetAll(c, t);
+            _fac._repoDBProducts.Delete(p);
+            all = _fac._repoDBProducts.GetAll();
             Assert.DoesNotContain(all, x => x.prd_name == notHere);
         });
     }

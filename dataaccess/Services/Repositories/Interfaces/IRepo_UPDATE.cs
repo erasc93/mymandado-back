@@ -1,3 +1,8 @@
-﻿namespace Services.Repositories.Interfaces;
+﻿using System.Data;
 
-public interface IRepo_UPDATE<T> { void Update(T updated); }
+namespace Services.Repositories.Interfaces;
+
+public interface IRepo_UPDATE<T>
+{
+    void Update(T updated);
+}

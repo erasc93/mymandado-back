@@ -12,12 +12,12 @@ public class Test_RepoProducts(MymandadoWebAppFactory _fac) : IClassFixture<Myma
     [Fact]
     public void TEST_TestProduct_DoesNotExist()
     {
-        _fac.SecureTest((conn, trans) =>
+        _fac.SecureTest(() =>
         {
             Product
                 testProduct = BuildNewProduct();
             Product[]
-                allUsers = _fac._repoProducts.GetAll(conn, trans);
+                allUsers = _fac._repoProducts.GetAll();
             Assert.Empty(allUsers.Where(x => x.name == PRD).ToArray());
         });
     }
@@ -25,41 +25,41 @@ public class Test_RepoProducts(MymandadoWebAppFactory _fac) : IClassFixture<Myma
     public void TEST_WhenCreated_PrductExists()
     {
 
-        _fac.SecureTest((conn, trans) =>
+        _fac.SecureTest(() =>
         {
             Product
                 testProduct = BuildNewProduct();
             bool
-            productExists = FoundByName_CompareValues(testProduct, conn, trans);
+            productExists = FoundByName_CompareValues(testProduct);
             Assert.False(productExists);
 
-            _fac._repoProducts.Add(ref testProduct, conn, trans);
+            _fac._repoProducts.Add(ref testProduct);
             Assert.False(UNDEFINED == testProduct.id);
-            productExists = FoundByName_CompareValues(testProduct, conn, trans);
+            productExists = FoundByName_CompareValues(testProduct);
             Assert.True(productExists);
-            productExists = FoundById(testProduct, conn, trans);
+            productExists = FoundById(testProduct);
             Assert.True(productExists);
         });
     }
     [Fact]
     public void TEST_WhenRenamed_WhenUnitChanges()
     {
-        _fac.SecureTest((conn, trans) =>
+        _fac.SecureTest(() =>
         {
             Product
                 testProduct = BuildNewProduct();
 
             bool
-            productExists = FoundByName_CompareValues(testProduct, conn, trans);
+            productExists = FoundByName_CompareValues(testProduct);
             Assert.False(productExists);
 
-            _fac._repoProducts.Add(ref testProduct, conn, trans);
+            _fac._repoProducts.Add(ref testProduct);
             Assert.False(UNDEFINED == testProduct.id);
-            productExists = FoundById(testProduct, conn, trans);
+            productExists = FoundById(testProduct);
             Assert.True(productExists);
 
-            _fac._repoProducts.RemoveItem(testProduct.id, conn, trans);
-            productExists = FoundById(testProduct, conn, trans);
+            _fac._repoProducts.RemoveItem(testProduct.id);
+            productExists = FoundById(testProduct);
             Assert.False(productExists);
         });
     }
@@ -67,49 +67,49 @@ public class Test_RepoProducts(MymandadoWebAppFactory _fac) : IClassFixture<Myma
     public void TEST_WhenDeleted_Success()
     {
 
-        _fac.SecureTest((conn, trans) =>
+        _fac.SecureTest(() =>
         {
             Product
                     testProduct = BuildNewProduct();
             bool
-                productExists = FoundByName_CompareValues(testProduct, conn, trans);
+                productExists = FoundByName_CompareValues(testProduct);
             Assert.False(productExists);
 
-            _fac._repoProducts.Add(ref testProduct, conn, trans);
+            _fac._repoProducts.Add(ref testProduct);
             Assert.False(UNDEFINED == testProduct.id);
-            productExists = FoundById(testProduct, conn, trans);
+            productExists = FoundById(testProduct);
             Assert.True(productExists);
 
-            _fac._repoProducts.RemoveItem(testProduct.id, conn, trans);
-            productExists = FoundById(testProduct, conn, trans);
+            _fac._repoProducts.RemoveItem(testProduct.id);
+            productExists = FoundById(testProduct);
             Assert.False(productExists);
         });
     }
     [Fact]
     public void TEST_WhenUpdated()
     {
-        _fac.SecureTest((conn, trans) =>
+        _fac.SecureTest(() =>
         {
             Product
                 testProduct = BuildNewProduct();
             bool
-                productExists = FoundByName_CompareValues(testProduct, conn, trans);
+                productExists = FoundByName_CompareValues(testProduct);
             Assert.False(productExists);
 
-            _fac._repoProducts.Add(ref testProduct, conn, trans);
+            _fac._repoProducts.Add(ref testProduct);
             Assert.False(UNDEFINED == testProduct.id);
-            productExists = FoundById(testProduct, conn, trans);
+            productExists = FoundById(testProduct);
             Assert.True(productExists);
 
             const string newname = "test3";
             const string newUnit = "unot";
             testProduct.name = newname;
             testProduct.unit = newUnit;
-            productExists = FoundByName_CompareValues(testProduct, conn, trans);
+            productExists = FoundByName_CompareValues(testProduct);
             Assert.False(productExists);
 
-            _fac._repoProducts.Update(testProduct, conn, trans);
-            productExists = FoundByName_CompareValues(testProduct, conn, trans);
+            _fac._repoProducts.Update(testProduct);
+            productExists = FoundByName_CompareValues(testProduct);
             Assert.True(productExists);
 
         });
@@ -124,21 +124,21 @@ public class Test_RepoProducts(MymandadoWebAppFactory _fac) : IClassFixture<Myma
             unit = ""
         };
     }
-    private bool FoundByName_CompareValues(Product product, IDbConnection conn, IDbTransaction trans)
+    private bool FoundByName_CompareValues(Product product)
     {
         bool output;
         Product[]
-            allProducts = _fac._repoProducts.GetAll(conn, trans),
+            allProducts = _fac._repoProducts.GetAll(),
             matching = allProducts.Where(x => x.name == product.name).ToArray();
 
         output = matching.Length == 1;
         return output;
     }
-    private bool FoundById(Product product, IDbConnection conn, IDbTransaction trans)
+    private bool FoundById(Product product)
     {
         bool output;
         Product?
-            allProducts = _fac._repoProducts.GetById(product.id, conn, trans);
+            allProducts = _fac._repoProducts.GetById(product.id);
         output = allProducts is not null
             && allProducts.name == product.name
             && allProducts.unit == product.unit;

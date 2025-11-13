@@ -7,27 +7,37 @@ namespace tests_mandado.Repositories;
 public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<MymandadoWebAppFactory>
 {
     [Fact]
+    public void TEST_GetALl()
+    {
+        User userWhenFound;
+        _fac.SecureTest(() =>
+        {
+            User[] users = _fac._repoUsers.GetAll();
+            Assert.NotEmpty(users);
+        });
+    }
+    [Fact]
     public void TEST_CreateDeleteUsers()
     {
         User userWhenFound;
-        _fac.SecureTest((conn, trans) =>
+        _fac.SecureTest(() =>
         {
             User? testUser;
             User[]
-                allUsers = _fac._repoUsers.GetAll(conn, trans);
+                allUsers = _fac._repoUsers.GetAll();
             Assert.NotEmpty(allUsers);
             string
                 userName = "usertest13";
-            testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+            testUser = _fac._repoUsers.GetUserByName(userName);
             Assert.Null(testUser);
 
-            testUser = _fac._repoUsers.AddByName(userName, conn, trans);
-            testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+            testUser = _fac._repoUsers.AddByName(userName);
+            testUser = _fac._repoUsers.GetUserByName(userName);
             Assert.NotNull(testUser);
             userWhenFound = testUser;
 
             Cart[]
-                carts = _fac._repoCart.GetAll(testUser, conn, trans);
+                carts = _fac._repoCart.GetAll(testUser);
             Assert.NotEmpty(carts);
             Cart?
                 firstCart = carts[0];
@@ -35,11 +45,11 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
             Assert.NotNull(firstCart.items);
             Assert.Empty(firstCart.items);
 
-            _fac._repoUsers.Delete(testUser, conn, trans);
-            testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+            _fac._repoUsers.Delete(testUser);
+            testUser = _fac._repoUsers.GetUserByName(userName);
             Assert.Null(testUser);
 
-            carts = _fac._repoCart.GetAll(userWhenFound, conn, trans);
+            carts = _fac._repoCart.GetAll(userWhenFound);
             Assert.Empty(carts);
         });
     }
@@ -51,16 +61,16 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
             userName = "usertest13";
         try
         {
-            _fac.SecureTest((conn, trans) =>
+            _fac.SecureTest(() =>
             {
                 User[]
-                    allUsers = _fac._repoUsers.GetAll(conn, trans);
+                    allUsers = _fac._repoUsers.GetAll();
                 Assert.NotEmpty(allUsers);
-                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+                testUser = _fac._repoUsers.GetUserByName(userName);
                 Assert.Null(testUser);
 
-                testUser = _fac._repoUsers.AddByName(userName, conn, trans);
-                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+                testUser = _fac._repoUsers.AddByName(userName);
+                testUser = _fac._repoUsers.GetUserByName(userName);
                 Assert.NotNull(testUser);
             });
             throw new TestFailureException();
@@ -80,25 +90,25 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
             userName = "usertest13";
         try
         {
-            _fac.SecureTest((conn, trans) =>
+            _fac.SecureTest(() =>
             {
                 User[]
-                    allUsers = _fac._repoUsers.GetAll(conn, trans);
+                    allUsers = _fac._repoUsers.GetAll();
                 Assert.NotEmpty(allUsers);
-                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+                testUser = _fac._repoUsers.GetUserByName(userName);
                 Assert.Null(testUser);
 
-                testUser = _fac._repoUsers.AddByName(userName, conn, trans);
-                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+                testUser = _fac._repoUsers.AddByName(userName);
+                testUser = _fac._repoUsers.GetUserByName(userName);
                 Assert.NotNull(testUser);
             });
             throw new TestFailureException();
         }
         catch (TestFailureException)
         {
-            _fac.SecureTest((conn, trans) =>
+            _fac.SecureTest(() =>
             {
-                testUser = _fac._repoUsers.GetUserByName(userName, conn, trans);
+                testUser = _fac._repoUsers.GetUserByName(userName);
                 Assert.Null(testUser);
             });
         }

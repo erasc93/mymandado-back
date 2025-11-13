@@ -7,7 +7,7 @@ public class MND_CART_ITEM : IDbTable
 {
 
     [_dap.Key]
-    public int crt_itid { get; set; }
+    public int crt_id { get; set; }
     public required int crt_usrid { get; set; }
     public required int crt_crtnb { get; set; }
     public required int crt_prdid { get; set; }

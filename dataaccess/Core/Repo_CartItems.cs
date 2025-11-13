@@ -18,7 +18,7 @@ public class Repo_CartItems(IQueries _query,
                             ) : ARepository(_query),
                                 IRepo_CartItems
 {
-    public void AddItem(User user, int cartnumber, ref CartItem item, IDbConnection? conn = null, IDbTransaction? transac = null)
+    public void AddItem(User user, int cartnumber, ref CartItem item)
     {
         MND_CART_ITEM model;
 
@@ -28,15 +28,15 @@ public class Repo_CartItems(IQueries _query,
             Product prd;
 
             prd = item.product;
-            _repoProducts.Add(ref prd, conn, transac);
+            _repoProducts.Add(ref prd);
             item.product = prd;
         }
 
         model = Factory.FromView(cartnumber, item, user);
-        model.crt_itid = _CRT_ITEMS.Add(ref model, conn, transac);
-        item.id = model.crt_itid;
+        model.crt_id = _CRT_ITEMS.Add(ref model);
+        item.id = model.crt_id;
     }
-    //public CartItem AddProduct(User user, Cart cart, Product product, IDbConnection? conn = null, IDbTransaction? transac = null)
+    //public CartItem AddProduct(User user, Cart cart, Product product)
     //{
     //    CartItem output;
     //    MND_CART_ITEM item;
@@ -45,11 +45,11 @@ public class Repo_CartItems(IQueries _query,
     //    bool itemExists = product.id != APP_PARAMS.instance.UNDEFINED;
     //    if (!itemExists)
     //    {
-    //        _repoProducts.Add(ref product, conn, transac);
+    //        _repoProducts.Add(ref product);
     //    }
 
     //    item = Factory.ToCART_ITEMS(user, cart, product, qtt: 0, isdone: false);
-    //    _CRT_ITEMS.Add(ref item, conn, transac);
+    //    _CRT_ITEMS.Add(ref item);
 
     //    output = Factory.ToView(item, product);
     //    return output;
@@ -65,36 +65,36 @@ public class Repo_CartItems(IQueries _query,
     //    _CRT_ITEMS.Add(ref newitems, c, t);
     //}
 
-    public void Update(User user, int cartnumber, CartItem item, IDbConnection? conn = null, IDbTransaction? transac = null)
+    public void Update(User user, int cartnumber, CartItem item)
     {
         MND_CART_ITEM mnd_cart_item;
 
         mnd_cart_item = new MND_CART_ITEM()
         {
+            crt_id = item.id,
             crt_crtnb = cartnumber,
-            crt_itid = item.id,
             crt_usrid = user.id,
             crt_prdid = item.product.id,
             crt_isdone = item.isdone,
             crt_qtty = item.quantity
         };
 
-        _CRT_ITEMS.Update(mnd_cart_item, conn, transac);
+        _CRT_ITEMS.Update(mnd_cart_item);
     }
-    public CartItem[] GetAll(User user, IDbConnection? conn = null, IDbTransaction? transac = null)
+    public CartItem[] GetAll(User user)
     {
         CartItem[] output;
 
-        MND_CART_ITEM[] crts = _CRT_ITEMS.GetAll(conn, transac);
+        MND_CART_ITEM[] crts = _CRT_ITEMS.GetAll();
         //MND_PRODUCT[] prds = _repo_PRD.GetAll();
-        Product[] prds = _repoProducts.GetAll(conn, transac);
+        Product[] prds = _repoProducts.GetAll();
 
         CartItem[] carts = (
                         from item in crts
                         where item.crt_usrid == user.id
                         select new CartItem()
                         {
-                            id = item.crt_itid,
+                            id = item.crt_id,
                             quantity = item.crt_qtty,
                             isdone = item.crt_isdone,
                             product = prds.Where(x => x.id == item.crt_prdid)
@@ -103,12 +103,12 @@ public class Repo_CartItems(IQueries _query,
                     ).ToArray();
         return carts;
     }
-    public void RemoveById(int id, IDbConnection? conn = null, IDbTransaction? transac = null)
+    public void RemoveById(int id)
     {
         MND_CART_ITEM
             item = new()
             {
-                crt_itid = id,
+                crt_id = id,
                 crt_crtnb = APP_PARAMS.instance.UNDEFINED,
                 crt_qtty = APP_PARAMS.instance.UNDEFINED,
                 crt_prdid = APP_PARAMS.instance.UNDEFINED,
@@ -116,7 +116,7 @@ public class Repo_CartItems(IQueries _query,
                 crt_isdone = false
             };
         bool
-            success = _CRT_ITEMS.Delete(item, conn, transac);
+            success = _CRT_ITEMS.Delete(item);
         if (!success)
         {
             string msg;
@@ -134,7 +134,7 @@ public class Repo_CartItems(IQueries _query,
             MND_CART_ITEM output;
             output = new MND_CART_ITEM()
             {
-                crt_itid = APP_PARAMS.instance.UNDEFINED,
+                crt_id = APP_PARAMS.instance.UNDEFINED,
                 crt_qtty = item.quantity,
                 crt_crtnb = cartNumber,
                 crt_usrid = user.id,
@@ -168,7 +168,7 @@ public class Repo_CartItems(IQueries _query,
             MND_CART_ITEM output;
             output = new MND_CART_ITEM()
             {
-                crt_itid = APP_PARAMS.instance.UNDEFINED,
+                crt_id = APP_PARAMS.instance.UNDEFINED,
                 crt_crtnb = cartnumber,
                 crt_usrid = user.id,
                 crt_prdid = product.id,
@@ -182,7 +182,7 @@ public class Repo_CartItems(IQueries _query,
         {
             CartItem output = new()
             {
-                id = item.crt_itid,
+                id = item.crt_id,
                 product = product,
                 isdone = item.crt_isdone,
                 quantity = item.crt_qtty

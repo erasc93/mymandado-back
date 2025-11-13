@@ -6,16 +6,15 @@ public interface IRepo_Users
 {
     bool Login(LoginInfo login);
     User GetCurrent();
-    User? GetUserByName(string userName, IDbConnection? conn = null, IDbTransaction? trans = null);
+    User? GetUserByName(string userName);
 
-    User[] GetAll(IDbConnection? conn = null, IDbTransaction? trans = null);
-    User AddByName(string userName, IDbConnection conn, IDbTransaction trans);
+    User[] GetAll();
     User AddByName(string userName);
 
     void Add(ref User item);
-    void Add(ref User item, IDbConnection conn, IDbTransaction trans);
 
-    bool Delete(User user, IDbConnection? conn=null, IDbTransaction? trans=null);
+    bool Delete(User user);
     void Update(User updated);
+
 
 }

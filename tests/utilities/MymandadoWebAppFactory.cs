@@ -9,6 +9,7 @@ using core_mandado.Users;
 using Microsoft.Extensions.DependencyInjection;
 using models.tables;
 using Services.Dapper.Interfaces;
+using Services.Dapper.Queries;
 using Services.Repositories;
 using System.Data;
 
@@ -58,17 +59,20 @@ public class MymandadoWebAppFactory : ACustomWebApplicationFactory
         services.AddScoped<ProductsController>();
         services.AddScoped<CartItemsController>();
     }
-    public void SecureTest(Action<IDbConnection, IDbTransaction> testfunction)
+
+    public void SecureTest(Action testfunction)
     {
-        Assert.Throws<Success>(() =>
-                    _queries.ExecuteInTransaction((conn, trans) =>
+        Assert.Throws<Success>(
+            () => _queries.ExecuteInTransaction(() =>
                     {
-                        testfunction(conn, trans);
+                        testfunction();
                         throw new Success();
                     })
-                );
+        );
     }
 
-
-    private class Success : Exception { }
+    /// <summary>
+    /// Intended to ensure rollback transaction are allways executed on tests;
+    /// </summary>
+    private class Success : Queries.RollBackException { }
 }

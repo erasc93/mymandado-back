@@ -5,17 +5,10 @@ using System.Data;
 
 namespace Services.Dapper.Queries;
 
-public class FreeQueryAsync : IFreeQueryAsync
+public class FreeQueryAsync(IConnectionInformation_DB _credentialDatabase, ITransactionHandle _transacHandle) : IFreeQueryAsync
 {
-    private IConnectionInformation_DB _credentialDatabase;
-
-    public FreeQueryAsync(IConnectionInformation_DB credentialDatabase)
-    {
-        _credentialDatabase = credentialDatabase;
-    }
-
     // --- --- --- FREE MySQL QUERY 
-    public async Task<IEnumerable<T>> Query<T>(string mySql, Dictionary<string, object>? param, IDbConnection? conn = null, IDbTransaction? transaction = null)
+    public async Task<IEnumerable<T>> Query<T>(string mySql, Dictionary<string, object>? param)
     {
         IEnumerable<T> output;
         DynamicParameters? parameters;
@@ -25,28 +18,28 @@ public class FreeQueryAsync : IFreeQueryAsync
         : new DynamicParameters(param);
 
         bool
-            useOwnConnection = conn is null;
+            useOwnConnection = _transacHandle.UseOwnConnection;
 
-        conn ??= new MySqlConnection(_credentialDatabase.ConnectionString);
+        IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
-        output = await conn.QueryAsync<T>(mySql, parameters, transaction);
+        output = await conn.QueryAsync<T>(mySql, parameters, _transacHandle.transaction);
         if (useOwnConnection) { conn.Close(); }
 
 
         return output;
     }
-    public async Task Query(string mySql, Dictionary<string, object>? param, IDbConnection? conn = null, IDbTransaction? transaction = null)
+    public async Task Query(string mySql, Dictionary<string, object>? param)
     {
         DynamicParameters? parameters;
         parameters = param is null
             ? null
             : new DynamicParameters(param);
         bool
-            useOwnConnection = conn is null;
+            useOwnConnection = _transacHandle.UseOwnConnection;
 
-        conn ??= new MySqlConnection(_credentialDatabase.ConnectionString);
+        IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
-        await conn.QueryAsync(sql: mySql, parameters, transaction);
+        await conn.QueryAsync(sql: mySql, parameters, _transacHandle.transaction);
         if (useOwnConnection) { conn.Close(); }
     }
 }

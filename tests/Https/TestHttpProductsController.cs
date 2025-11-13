@@ -1,15 +1,12 @@
 ﻿//https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/test-min-api?view=aspnetcore-9.0
 
+using api_mandado.Controllers;
+using core_mandado.Products;
+using core_mandado.Users;
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using api_mandado.Controllers;
-using api_mandado.services;
-using core_mandado.Products;
-using core_mandado.Users;
-using core_mandado.Users.Security;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using tests_mandado.utilities;
 
 namespace tests_mandado.Https;
