@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace core_mandado.Users.Security;
+namespace api_mandado.services.Security;
 
 public interface IJwtTokenGenerator
 {

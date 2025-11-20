@@ -19,17 +19,6 @@ public class Repo_Users(
     {
         return login.username == "manu" || login.username == "cleo";
     }
-    public User GetCurrent()
-    {
-        User
-            u = new ()
-            {
-                id = 1,
-                name = "manu",
-                role = User.Role.admin
-            };
-        return u;
-    }
     public User? GetUserByName(string userName)
     {
         string query;

@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 
-namespace core_mandado.Users.Security;
+namespace api_mandado.services.Security;
 
 public class JwtTokenGenerator : IJwtTokenGenerator
 {

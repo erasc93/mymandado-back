@@ -26,7 +26,7 @@ public class CartController(
         Cart[] output;
         User?
             user = _repoUser.GetUserByName(_username)
-            ?? throw new Exception($"user {_username} could not be found");
+            ?? throw new Exception($"user '{_username}' could not be found");
         output = _repoCart.GetAll(user) ?? [];
         return Ok(output);
     }

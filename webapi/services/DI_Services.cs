@@ -1,8 +1,8 @@
-﻿using core;
+﻿using api_mandado.services.Security;
+using core;
 using core_mandado.Cart;
 using core_mandado.Products;
 using core_mandado.Users;
-using core_mandado.Users.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;

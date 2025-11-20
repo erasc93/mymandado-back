@@ -28,11 +28,15 @@ public class CartItemsController(
     public ActionResult<CartItem[]> Get()
     {
         CartItem[] output;
-        User? 
-            user = _repoUser.GetUserByName(_username) 
-            ?? throw new Exception($"user {_username} could not be found");
+        User?
+            user = _repoUser.GetUserByName(_username)
+            ?? ThrowUserNotFound();
         output = _cartitemsRepository.GetAll(user) ?? [];
         return Ok(output);
+    }
+    private User ThrowUserNotFound()
+    {
+        throw new Exception($"user {_username} could not be found");
     }
 
 
@@ -41,8 +45,8 @@ public class CartItemsController(
     public ActionResult<CartItem> Post(int cartNumber, CartItem value)
     {
         //TODO: Get User from session guid
-        User
-            user = _repoUser.GetCurrent();
+        User?
+            user = _repoUser.GetUserByName(_username) ?? ThrowUserNotFound();
         //_repoCart.Add
         _cartitemsRepository.AddItem(user, cartNumber, ref value);
         return value;
@@ -51,7 +55,7 @@ public class CartItemsController(
     [HttpPut("{cartNumber}")]
     public void Put(int cartNumber, CartItem value)
     {
-        User user = _repoUser.GetCurrent();
+        User? user = _repoUser.GetUserByName(_username) ?? ThrowUserNotFound();
         _cartitemsRepository.Update(user, cartNumber, value);
     }
 

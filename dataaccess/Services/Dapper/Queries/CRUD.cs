@@ -21,10 +21,9 @@ public class CRUD(IConnectionInformation_DB _credentialDatabase, ITransactionHan
         {
             id = (int)conn.Insert(entityToInsert, _transacHandle.transaction); // todo: verify update id works
         }
-        catch(Exception e)
+        catch(Exception)
         {
-            id = -13;
-            string k = "";
+            throw;
         }
         if (useOwnConnection) { conn.Close(); }
         return id;
