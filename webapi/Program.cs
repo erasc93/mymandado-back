@@ -1,6 +1,6 @@
 using api_mandado.services;
 
-namespace api_mymandado;
+namespace api_mandado;
 
 
 public class Program
@@ -47,7 +47,6 @@ public class Program
         app.UseAuthentication();//
         app.UseAuthorization();
         app.MapControllers();
-
 
         app.Run();
     }

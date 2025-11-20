@@ -2,9 +2,9 @@
 
 public class DbInfo_Columns
 {
-    public string Field { get; set; }
-    public string Type { get; set; }
-    public string Null { get; set; }
-    public string Key { get; set; }
-    public string Extra { get; set; }
+    public required string Field { get; set; }
+    public required string Type { get; set; }
+    public required string Null { get; set; }
+    public required string Key { get; set; }
+    public required string Extra { get; set; }
 }

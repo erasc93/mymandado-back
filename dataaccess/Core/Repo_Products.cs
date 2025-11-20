@@ -2,7 +2,7 @@
 using models.tables;
 using Services.Dapper.Interfaces;
 using Services.Repositories;
-using Services.Repositories.Abstractions;
+using Services.Repositories.Generics;
 using System.Data;
 
 namespace core;
@@ -15,9 +15,8 @@ public class Repo_Products(
     public Product[] GetAll()
     {
         Product[]
-            output = (from p in _repo_PRD.GetAll()
-                      select Factory.ToView(p))
-                      .ToArray();
+            output = [.. (from p in _repo_PRD.GetAll()
+                      select Factory.ToView(p))];
         return output;
     }
     public Product? GetById(int id)

@@ -50,7 +50,7 @@ public class TestLogic(MymandadoWebAppFactory _fac) : IClassFixture<MymandadoWeb
             all = _fac._repoDBProducts.GetAll();
 
             string notHere = "nothere";
-            MND_PRODUCT? p = new MND_PRODUCT() { prd_name = notHere };
+            MND_PRODUCT? p = new() { prd_name = notHere };
 
             all = _fac._repoDBProducts.GetAll();
             Assert.DoesNotContain(all, x => x.prd_name == notHere);
@@ -58,9 +58,9 @@ public class TestLogic(MymandadoWebAppFactory _fac) : IClassFixture<MymandadoWeb
 
             all = _fac._repoDBProducts.GetAll();
             p = all.Where(x => x.prd_name == notHere).FirstOrDefault();
-            Assert.Contains(all, x => x.prd_id == p.prd_id); // id KEY
+            Assert.Contains(all, x => x.prd_id == p?.prd_id); // id KEY
 
-            _fac._repoDBProducts.Delete(p);
+            _fac._repoDBProducts.Delete(p!);
             all = _fac._repoDBProducts.GetAll();
             Assert.DoesNotContain(all, x => x.prd_name == notHere);
         });

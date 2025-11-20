@@ -35,19 +35,19 @@ public class ProductsController : ControllerBase
 
     // GET api/<ProductsController>/5
     [HttpGet("{id}")]
-    public Product Get(int id)
+    public Product? Get(int id)
     {
-        Product output;
+        Product? output;
         output = _productsRepository.GetById(id);
         return output;
     }
 
     // POST api/<ProductsController>
     [HttpPost]
-    public ActionResult<Product> Post([FromBody] Product value)
+    public ActionResult<Product> Post( Product value)
     {
         _productsRepository.Add(ref value);
-        return CreatedAtAction(nameof(Get),new {id=value.id},value);
+        return CreatedAtAction(nameof(Get), new { value.id }, value);
     }
 
     [HttpPut]

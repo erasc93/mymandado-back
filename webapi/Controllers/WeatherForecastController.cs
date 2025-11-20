@@ -1,4 +1,4 @@
-﻿using core_mandado.Models;
+﻿using core_mandado.Weather;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

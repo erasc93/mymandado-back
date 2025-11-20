@@ -1,6 +1,6 @@
 ﻿using Services.Dapper.Interfaces;
 
-namespace Services.Repositories.Abstractions;
+namespace Services.Repositories.Generics;
 
 public abstract class ARepository
 {

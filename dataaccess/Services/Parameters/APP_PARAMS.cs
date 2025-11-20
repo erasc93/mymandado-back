@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace core_mandado.parameters;
+namespace Services.Parameters;
 
 internal sealed class APP_PARAMS
 {

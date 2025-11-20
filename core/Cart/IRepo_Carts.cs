@@ -7,9 +7,9 @@ namespace core_mandado.Cart;
 public interface IRepo_Cart
 {
     Cart[] GetAll(User user);
-    Cart GetBy(User testUser, int id);
+    Cart? GetBy(User testUser, int id);
 
-    Cart AddNew(User user, int cartnumber);
+    Cart AddEmptyCart(User user, int cartnumber);
     void Remove(Cart cart);
 
     void Update(User user, Cart newCart);

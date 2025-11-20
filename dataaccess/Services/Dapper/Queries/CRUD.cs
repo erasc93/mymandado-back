@@ -17,7 +17,15 @@ public class CRUD(IConnectionInformation_DB _credentialDatabase, ITransactionHan
         IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
 
         if (useOwnConnection) { conn.Open(); }
-        id = (int)conn.Insert(entityToInsert, _transacHandle.transaction); // todo: verify update id works
+        try
+        {
+            id = (int)conn.Insert(entityToInsert, _transacHandle.transaction); // todo: verify update id works
+        }
+        catch(Exception e)
+        {
+            id = -13;
+            string k = "";
+        }
         if (useOwnConnection) { conn.Close(); }
         return id;
     }
@@ -76,7 +84,7 @@ public class CRUD(IConnectionInformation_DB _credentialDatabase, ITransactionHan
         output = conn.GetAll<T>(_transacHandle.transaction);
         if (useOwnConnection) { conn.Close(); }
 
-        return output.ToArray();
+        return [.. output];
     }
     public T? GetById<T>(int id) where T : class
     {

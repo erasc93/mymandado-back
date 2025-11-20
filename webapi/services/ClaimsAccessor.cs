@@ -2,18 +2,20 @@
 
 namespace api_mandado.services;
 
-public class ClaimsAccessor
+public class ClaimsAccessor(IHttpContextAccessor _httpContextAccessor)
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    //private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ClaimsAccessor(IHttpContextAccessor accessor)
-    {
-        _httpContextAccessor = accessor;
-    }
+    //public ClaimsAccessor()
+    //{
+    //    _httpContextAccessor = accessor;
+    //}
 
-    public string? GetUsername()
+    public string GetUsername()
     {
-        return _httpContextAccessor.HttpContext?.User?.Claims
+        string? username
+        = _httpContextAccessor.HttpContext?.User?.Claims
             ?.FirstOrDefault(c => c.Type == "username")?.Value;
+        return username ?? string.Empty;
     }
 }

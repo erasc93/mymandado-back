@@ -8,8 +8,8 @@ namespace models.information_schema;
 
 public class StoredProcedure
 {
-    public string ROUTINE_SCHEMA { get; set; }
-    public string ROUTINE_NAME { get; set; }
-    public string ROUTINE_TYPE { get; set; }
-    public string SQL_PATH { get; set; }
+    public required string ROUTINE_SCHEMA { get; set; }
+    public required string ROUTINE_NAME { get; set; }
+    public required string ROUTINE_TYPE { get; set; }
+    public required string SQL_PATH { get; set; }
 }

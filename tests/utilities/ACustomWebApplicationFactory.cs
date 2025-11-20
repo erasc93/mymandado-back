@@ -2,8 +2,8 @@
 
 namespace tests_mandado.utilities;
 
+using api_mandado;
 using api_mandado.services;
-using api_mymandado;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;

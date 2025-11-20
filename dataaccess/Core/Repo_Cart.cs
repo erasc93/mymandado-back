@@ -1,30 +1,28 @@
 ﻿using core_mandado.Cart;
-using core_mandado.parameters;
 using core_mandado.Products;
 using core_mandado.Users;
 using models.tables;
 using Services.Dapper.Interfaces;
+using Services.Parameters;
 using Services.Repositories;
-using Services.Repositories.Abstractions;
+using Services.Repositories.Generics;
 using System.Data;
 
 namespace core;
 
 public class Repo_Cart(IQueries queries,
-                            IRepo_CartItems _repoCartItems,
                             IRepo_Products _repoProducts,
                             Repo_AnyTable<MND_CART_ITEM> _CRT_ITEMS,
-                            Repo_AnyTable<MND_USERS> _repoUsers,
                             Repo_AnyTable<MND_PRODUCT> _PRDODUCTS
 
     ) : ARepository(queries), IRepo_Cart
 {
     private const string DESC = "";
     private const string NAME = "cart";
-    public Cart AddNew(User user, int cartnumber)
+    public Cart AddEmptyCart(User user, int cartnumber)
     {
         MND_CART
-            firstCart = new MND_CART
+            firstCart = new()
             {
                 //car_id = APP_PARAMS.instance.UNDEFINED,
                 car_usrid = user.id,
@@ -36,14 +34,14 @@ public class Repo_Cart(IQueries queries,
         return Factory.FillRAW(firstCart, [], []);
     }
 
-    public void AddToCart(Product newproduct)
-    {
-        throw new Exception();
-    }
+    //public static void AddToCart(Product newproduct)
+    //{
+    //    throw new Exception();
+    //}
 
     public Cart[] GetAll(User user)
     {
-        Cart[] output = [];
+        Cart[] output;
 
         MND_CART[]
             mnd_carts = QueryCARTS(user);
@@ -72,14 +70,10 @@ public class Repo_Cart(IQueries queries,
         MND_PRODUCT[]
             products = QueryItemsPRODUCTS(mnd_cartitems);
 
-        //output = new Cart[mnd_carts.Length];
-        //for (int i = 0; i < mnd_carts.Length; i++)
-        //{
         if (mnd_carts != null)
         {
             output = Factory.BuildCart(mnd_carts, mnd_cartitems, products);
         }
-        //}
 
         return output;
     }
@@ -110,8 +104,7 @@ public class Repo_Cart(IQueries queries,
         string
             query = "SELECT * FROM  CART WHERE car_usrid=@car_usrid;";
         MND_CART[]
-            mnd_carts = _query.free.Query<MND_CART>(query, param)
-                                .ToArray();
+            mnd_carts = [.. _query.free.Query<MND_CART>(query, param)];
         return mnd_carts;
     }
     private MND_CART? QueryCART(User user, int id)
@@ -138,9 +131,8 @@ public class Repo_Cart(IQueries queries,
         string
         query = "SELECT * from CART_ITEMS WHERE crt_usrid=@car_usrid AND crt_crtnb=@car_crtnb;";
         MND_CART_ITEM[]
-            mnd_cartitems = _query.free.Query<MND_CART_ITEM>(query, param)
-                                        .DistinctBy(item => (item.crt_crtnb, item.crt_prdid))
-                                        .ToArray();
+            mnd_cartitems = [.. _query.free.Query<MND_CART_ITEM>(query, param)
+                                            .DistinctBy(item => (item.crt_crtnb, item.crt_prdid))];
         return mnd_cartitems;
     }
     private MND_CART_ITEM[] QueryCART_ITEMS(User user)
@@ -150,9 +142,7 @@ public class Repo_Cart(IQueries queries,
         string
         query = "SELECT * from CART_ITEMS WHERE crt_usrid=@car_usrid;";
         MND_CART_ITEM[]
-            mnd_cartitems = _query.free.Query<MND_CART_ITEM>(query, param)
-                                        .DistinctBy(item => (item.crt_crtnb, item.crt_prdid))
-                                        .ToArray();
+            mnd_cartitems = [.. _query.free.Query<MND_CART_ITEM>(query, param).DistinctBy(item => (item.crt_crtnb, item.crt_prdid))];
         return mnd_cartitems;
     }
     private MND_PRODUCT[] QueryItemsPRODUCTS(MND_CART_ITEM[] mnd_cartitems)
@@ -167,8 +157,7 @@ public class Repo_Cart(IQueries queries,
             query = "SELECT * FROM PRODUCTS WHERE prd_id IN @prd_id";
 
         MND_PRODUCT[]
-            output = _query.free.Query<MND_PRODUCT>(query, param)
-                           .ToArray();
+            output = [.. _query.free.Query<MND_PRODUCT>(query, param)];
         return output;
     }
 
@@ -218,7 +207,7 @@ public class Repo_Cart(IQueries queries,
                 userid = car.car_usrid,
                 name = car.car_name,
                 description = car.car_desc,
-                items = (from MND_CART_ITEM itm in mnd_cartitems
+                items = [.. (from MND_CART_ITEM itm in mnd_cartitems
                          select new CartItem
                          {
                              id = itm.crt_id,
@@ -232,7 +221,7 @@ public class Repo_Cart(IQueries queries,
                                             unit = prd.prd_unit
                                         }).First(),
                              quantity = itm.crt_qtty
-                         }).ToArray()
+                         })]
             };
         }
         public static Cart BuildCart(MND_CART car, MND_CART_ITEM[] mnd_cartitems, MND_PRODUCT[] products)
@@ -249,7 +238,7 @@ public class Repo_Cart(IQueries queries,
         }
         private static CartItem[] BuildItemsInList(MND_CART car_crtnb, MND_CART_ITEM[] mnd_cartitems, MND_PRODUCT[] products)
         {
-            return (from MND_CART_ITEM itm in mnd_cartitems
+            return [.. (from MND_CART_ITEM itm in mnd_cartitems
                     where itm.crt_crtnb == car_crtnb.car_crtnb
                     select new CartItem
                     {
@@ -257,7 +246,7 @@ public class Repo_Cart(IQueries queries,
                         isdone = itm.crt_isdone,
                         product = BuildProductInList(itm, products),
                         quantity = itm.crt_qtty
-                    }).ToArray();
+                    })];
         }
         private static Product BuildProductInList(MND_CART_ITEM mnd_cartitem, MND_PRODUCT[] products)
         {

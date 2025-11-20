@@ -2,7 +2,7 @@
 
 using System.Net;
 using System.Threading.Tasks;
-using api_mymandado;
+using api_mandado;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 

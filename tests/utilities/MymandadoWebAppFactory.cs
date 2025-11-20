@@ -36,7 +36,7 @@ public class MymandadoWebAppFactory : ACustomWebApplicationFactory
     {
         using var scope = this.Services.CreateScope();
 
-        _handle = Svc<ITransactionHandle>(scope);
+        _handle = Svc<ITransactionHandle>(scope)!;
         _queries = Svc<IQueries>(scope)!;
 
         _repoUsers = Svc<IRepo_Users>(scope)!;
@@ -55,7 +55,7 @@ public class MymandadoWebAppFactory : ACustomWebApplicationFactory
         _repoTables = Svc<Repo_TableInfos>(scope)!;
     }
 
-    private T? Svc<T>(IServiceScope scope) where T : notnull
+    private static T? Svc<T>(IServiceScope scope) where T : notnull
         => scope.ServiceProvider.GetRequiredService<T>();
     protected override void AddControllers(IServiceCollection services)
     {

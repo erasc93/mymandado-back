@@ -13,7 +13,6 @@ namespace api_mandado.Controllers;
 public class CartItemsController(
         IRepo_CartItems _cartitemsRepository,
         IRepo_Users _repoUser,
-        IRepo_Cart _repoCart,
         ClaimsAccessor _svc_context
     ) : ControllerBase
 {
@@ -22,15 +21,17 @@ public class CartItemsController(
     //private ClaimsAccessor _svc_context { get; set; }
     //private string _username { get; set; }
     private string _username { get; init; } = _svc_context.GetUsername();
-    
+
     // GET: api/<CartItemsController>
     [HttpGet]
     [Authorize]
     public ActionResult<CartItem[]> Get()
     {
-        User user = _repoUser.GetUserByName(_username);
         CartItem[] output;
-        output = _cartitemsRepository.GetAll(user);
+        User? 
+            user = _repoUser.GetUserByName(_username) 
+            ?? throw new Exception($"user {_username} could not be found");
+        output = _cartitemsRepository.GetAll(user) ?? [];
         return Ok(output);
     }
 
@@ -47,11 +48,11 @@ public class CartItemsController(
         return value;
     }
 
-    [HttpPut]
+    [HttpPut("{cartNumber}")]
     public void Put(int cartNumber, CartItem value)
     {
         User user = _repoUser.GetCurrent();
-        _cartitemsRepository.Update(user,cartNumber, value);
+        _cartitemsRepository.Update(user, cartNumber, value);
     }
 
     [HttpDelete("{id}")]
@@ -59,5 +60,6 @@ public class CartItemsController(
     {
         _cartitemsRepository.RemoveById(id);
     }
+
 
 }

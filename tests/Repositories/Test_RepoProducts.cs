@@ -12,6 +12,7 @@ public class Test_RepoProducts(MymandadoWebAppFactory _fac) : IClassFixture<Myma
     [Fact]
     public void TEST_TestProduct_DoesNotExist()
     {
+        
         _fac.SecureTest(() =>
         {
             Product
@@ -115,7 +116,7 @@ public class Test_RepoProducts(MymandadoWebAppFactory _fac) : IClassFixture<Myma
         });
     }
     // --- --- ---
-    private Product BuildNewProduct()
+    private static Product BuildNewProduct()
     {
         return new Product
         {
@@ -129,7 +130,7 @@ public class Test_RepoProducts(MymandadoWebAppFactory _fac) : IClassFixture<Myma
         bool output;
         Product[]
             allProducts = _fac._repoProducts.GetAll(),
-            matching = allProducts.Where(x => x.name == product.name).ToArray();
+            matching = [.. allProducts.Where(x => x.name == product.name)];
 
         output = matching.Length == 1;
         return output;

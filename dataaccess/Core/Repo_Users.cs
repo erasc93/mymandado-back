@@ -3,7 +3,7 @@ using core_mandado.Users;
 using Google.Protobuf.WellKnownTypes;
 using models.tables;
 using Services.Dapper.Interfaces;
-using Services.Repositories.Abstractions;
+using Services.Repositories.Generics;
 using Services.Repositories.Interfaces;
 using System.Data;
 
@@ -22,7 +22,7 @@ public class Repo_Users(
     public User GetCurrent()
     {
         User
-            u = new User()
+            u = new ()
             {
                 id = 1,
                 name = "manu",
@@ -34,7 +34,7 @@ public class Repo_Users(
     {
         string query;
         Dictionary<string, object>
-            param = new Dictionary<string, object>()
+            param = new ()
                     {
                         {"@username",userName},
                     };
@@ -53,21 +53,21 @@ public class Repo_Users(
         MND_USERS[]
             mndusers = _query.crud.GetAll<MND_USERS>();
         User[]
-            output = (from u in mndusers
+            output = [.. (from u in mndusers
                       select new User()
                       {
                           id = u.usr_id,
                           name = u.usr_name,
                           role = u.usr_role
                       }
-                  ).ToArray();
+                  )];
         return output;
     }
     public User AddByName(string userName)
     {
 
         MND_USERS
-            mnduser = new MND_USERS
+            mnduser = new()
             {
                 usr_name = userName,
                 usr_role = User.Role.friend
@@ -75,7 +75,7 @@ public class Repo_Users(
         _query.crud.Add<MND_USERS>(ref mnduser);
 
         User
-            output = new User()
+            output = new()
             {
                 id = mnduser.usr_id,
                 name = mnduser.usr_name,
@@ -83,7 +83,7 @@ public class Repo_Users(
             };
 
 
-        Cart cart = _repoCart.AddNew(output, 0);
+         _repoCart.AddEmptyCart(output, 0);
 
         return output;
     }
@@ -92,13 +92,12 @@ public class Repo_Users(
     public User AddByNameSafe(string userName)
     {
         MND_USERS mnduser;
-        int? userid;
         User output;
 
         mnduser = new MND_USERS
         {
             usr_name = userName,
-            usr_role = DEFAULTS.role
+            usr_role = DEFAULTS.ROLE
         };
         _query.crud.Add(ref mnduser);
         output = new User()
@@ -162,7 +161,7 @@ public class Repo_Users(
         public static User ToView(MND_USERS u)
         {
             User
-                output = new User()
+                output = new()
                 {
                     id = u.usr_id,
                     name = u.usr_name,
@@ -173,6 +172,6 @@ public class Repo_Users(
     }
     private static class DEFAULTS
     {
-        public const User.Role role = User.Role.friend;
+        public const User.Role ROLE = User.Role.friend;
     }
 }

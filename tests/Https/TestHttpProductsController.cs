@@ -10,6 +10,7 @@ using System.Net.Http.Json;
 using tests_mandado.utilities;
 
 namespace tests_mandado.Https;
+
 public class TestHttpProductsController : IClassFixture<MymandadoWebAppFactory>
 {
     private HttpClient _client { get; init; }
@@ -19,12 +20,12 @@ public class TestHttpProductsController : IClassFixture<MymandadoWebAppFactory>
 
     private const string URL = "/api/products";
 
-    private readonly LoginInfo _loginInfo = new LoginInfo() { username = "manu", password = null };
+    private readonly LoginInfo _loginInfo = new() { username = "manu", password = null };
     public TestHttpProductsController(MymandadoWebAppFactory webAppFactory)
     {
         IServiceScope s;
         AuthResponse? _authResponse;
-        using (s = s = webAppFactory.Services.CreateScope())
+        using (s = webAppFactory.Services.CreateScope())
         {
             _authResponse = Svc<UsersController>(s)?.Login(_loginInfo).Value as AuthResponse;
         }

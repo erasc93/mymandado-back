@@ -9,16 +9,8 @@ namespace api_mandado.Controllers
     [Route("api/[controller]")]
     [ApiController]
 
-    public class UsersController : ControllerBase
+    public class UsersController(IJwtTokenGenerator _jwtTokenGenerator, IRepo_Users _repoUsers) : ControllerBase
     {
-        private IJwtTokenGenerator _authManager { get; init; }
-        private IRepo_Users _repoUsers { get; init; }
-
-        public UsersController(IJwtTokenGenerator jwtTokenGenerator, IRepo_Users userManager)
-        {
-            _repoUsers = userManager;
-            _authManager = jwtTokenGenerator;
-        }
 
         /// <summary>
         /// permet de se connecter à l'application
@@ -33,7 +25,7 @@ namespace api_mandado.Controllers
             Claim[] claims;
 
             claims = UserClaimInfo(loginInfo);
-            tokenstr = _authManager.GenerateJwtTokenAsString(claims);
+            tokenstr = _jwtTokenGenerator.GenerateJwtTokenAsString(claims);
             token = new AuthResponse(tokenstr);
 
             return Ok(token);
@@ -73,10 +65,6 @@ namespace api_mandado.Controllers
 
     }
 
-}
-public class AuthResponse(string tokenstring)
-{
-    public string token { get; set; } = tokenstring;
 }
 
 

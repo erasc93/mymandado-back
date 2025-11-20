@@ -1,20 +1,19 @@
 ﻿using core_mandado.Cart;
-using core_mandado.parameters;
 using core_mandado.Products;
 using core_mandado.Users;
 using models.tables;
 using Services.Dapper.Interfaces;
+using Services.Parameters;
 using Services.Repositories;
-using Services.Repositories.Abstractions;
+using Services.Repositories.Generics;
 using System.Data;
 using System.Transactions;
 
 namespace core;
+
 public class Repo_CartItems(IQueries _query,
                             IRepo_Products _repoProducts,
-                            Repo_AnyTable<MND_CART_ITEM> _CRT_ITEMS,
-                            Repo_AnyTable<MND_USERS> _repoUsers,
-                            Repo_AnyTable<MND_PRODUCT> _PRDODUCTS
+                            Repo_AnyTable<MND_CART_ITEM> _CRT_ITEMS
                             ) : ARepository(_query),
                                 IRepo_CartItems
 {
@@ -22,13 +21,21 @@ public class Repo_CartItems(IQueries _query,
     {
         MND_CART_ITEM model;
 
-        bool itemExists = item.id != APP_PARAMS.instance.UNDEFINED;
+        bool itemExists = item.product.id != APP_PARAMS.instance.UNDEFINED;
         if (!itemExists)
         {
-            Product prd;
+            Product? prd;
 
-            prd = item.product;
-            _repoProducts.Add(ref prd);
+            string itemname = item.product.name;
+
+            prd = _repoProducts.GetAll().Where(p => p.name == itemname).FirstOrDefault();
+
+            if (prd is null)
+            {
+                prd = item.product;
+                _repoProducts.Add(ref prd);
+                item.product = prd;
+            }
             item.product = prd;
         }
 
@@ -36,34 +43,6 @@ public class Repo_CartItems(IQueries _query,
         model.crt_id = _CRT_ITEMS.Add(ref model);
         item.id = model.crt_id;
     }
-    //public CartItem AddProduct(User user, Cart cart, Product product)
-    //{
-    //    CartItem output;
-    //    MND_CART_ITEM item;
-    //    //Product prd;
-
-    //    bool itemExists = product.id != APP_PARAMS.instance.UNDEFINED;
-    //    if (!itemExists)
-    //    {
-    //        _repoProducts.Add(ref product);
-    //    }
-
-    //    item = Factory.ToCART_ITEMS(user, cart, product, qtt: 0, isdone: false);
-    //    _CRT_ITEMS.Add(ref item);
-
-    //    output = Factory.ToView(item, product);
-    //    return output;
-    //}
-    //public void AddAll(int userid, int cartnumber, IDbConnection? c = null, IDbTransaction? t = null)
-    //{
-
-    //    MND_PRODUCT[]
-    //        products = _PRDODUCTS.GetAll(c, t);
-    //    MND_CART_ITEM[]
-    //        newitems = Factory.ToCART_ITEMS(userid, cartnumber, products, isdone: false);
-    //    //foreach(newitems)
-    //    _CRT_ITEMS.Add(ref newitems, c, t);
-    //}
 
     public void Update(User user, int cartnumber, CartItem item)
     {
@@ -83,13 +62,11 @@ public class Repo_CartItems(IQueries _query,
     }
     public CartItem[] GetAll(User user)
     {
-        CartItem[] output;
-
         MND_CART_ITEM[] crts = _CRT_ITEMS.GetAll();
         //MND_PRODUCT[] prds = _repo_PRD.GetAll();
         Product[] prds = _repoProducts.GetAll();
 
-        CartItem[] carts = (
+        CartItem[] carts = [.. (
                         from item in crts
                         where item.crt_usrid == user.id
                         select new CartItem()
@@ -100,7 +77,7 @@ public class Repo_CartItems(IQueries _query,
                             product = prds.Where(x => x.id == item.crt_prdid)
                                           .FirstOrDefault()!,
                         }
-                    ).ToArray();
+                    )];
         return carts;
     }
     public void RemoveById(int id)

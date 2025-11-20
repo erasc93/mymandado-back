@@ -27,11 +27,11 @@ public class Queries(
 
             if (immediatRollback)
             {
-                _transacHandle.transaction.Rollback();
+                _transacHandle.transaction!.Rollback();
             }
             else
             {
-                _transacHandle.transaction.Commit();
+                _transacHandle.transaction!.Commit();
             }
         }
         catch (Exception e)

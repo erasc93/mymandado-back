@@ -9,7 +9,6 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
     [Fact]
     public void TEST_GetALl()
     {
-        User userWhenFound;
         _fac.SecureTest(() =>
         {
             User[] users = _fac._repoUsers.GetAll();

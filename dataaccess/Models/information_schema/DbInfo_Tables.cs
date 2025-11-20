@@ -2,5 +2,5 @@
 
 public class DbInfo_Tables
 {
-    public string Tables_in_mymandado { get; set; }
+    public required string Tables_in_mymandado { get; set; }
 }

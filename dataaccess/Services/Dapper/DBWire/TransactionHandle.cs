@@ -42,8 +42,8 @@ public class TransactionHandle(IConnectionInformation_DB _credentialDatabase) : 
         {
             throw new DisposeProblem();
         }
-        transaction.Dispose();
-        connection.Dispose();
+        transaction!.Dispose();
+        connection!.Dispose();
     }
     public class DisposeProblem : Exception { }
 }

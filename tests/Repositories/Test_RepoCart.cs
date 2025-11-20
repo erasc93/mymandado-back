@@ -27,15 +27,15 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
 
             Cart[]
                 carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 1);
+            Assert.Single(carts);
             Assert.NotNull(carts[0].items);
             Assert.Empty(carts[0].items!);
 
             int
             nextid = carts.Length + 1;
-            _fac._repoCart.AddNew(testUser, nextid);
+            _fac._repoCart.AddEmptyCart(testUser, nextid);
             carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 2);
+            Assert.Equal(2, carts.Length);
             Assert.NotNull(carts[1].items);
             Assert.Empty(carts[1].items!);
 
@@ -56,20 +56,20 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
 
             Cart[]
                 carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 1);
+            Assert.Single(carts);
             Assert.NotNull(carts[0].items);
             Assert.Empty(carts[0].items!);
 
             Cart
-                newCart = _fac._repoCart.AddNew(testUser, 1);
+                newCart = _fac._repoCart.AddEmptyCart(testUser, 1);
             carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 2);
+            Assert.Equal(2, carts.Length);
             Assert.NotNull(carts[1].items);
             Assert.Empty(carts[1].items!);
 
             _fac._repoCart.Remove(newCart);
             carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 1);
+            Assert.Single(carts);
         });
     }
     [Fact]
@@ -92,7 +92,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
             Assert.Empty(carts[0].items!);
 
             Cart
-                newCart = _fac._repoCart.AddNew(testUser, 1);
+                newCart = _fac._repoCart.AddEmptyCart(testUser, 1);
             carts = _fac._repoCart.GetAll(testUser);
             Assert.Equal(2, carts.Length);
             Assert.NotNull(carts[1].items);
@@ -104,14 +104,14 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
             newCart.name = newname;
             newCart.description = newdescription;
             _fac._repoCart.Update(testUser, newCart);
-            Cart
+            Cart?
             updated = _fac._repoCart.GetBy(testUser, newCart.id);
-            Assert.Equal(newdescription, updated.description);
-            Assert.Equal(newname, updated.name);
+            Assert.Equal(newdescription, updated?.description);
+            Assert.Equal(newname, updated?.name);
 
             _fac._repoCart.Remove(newCart);
             carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 1);
+            Assert.Single(carts);
         });
     }
     [Fact]
@@ -129,7 +129,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
 
             Cart[]
                 carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 1);
+            Assert.Single(carts);
             Assert.NotNull(carts[0].items);
             Assert.Empty(carts[0].items!);
 
@@ -137,13 +137,13 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
                 newCart = carts[0];
 
             Product
-            newproduct1 = new Product()
+            newproduct1 = new()
             {
                 id = UNDEFINED,
                 name = "testproduct1",
                 unit = "",
             },
-            newproduct2 = new Product()
+            newproduct2 = new()
             {
                 id = UNDEFINED,
                 name = "testproduct2",
@@ -162,14 +162,14 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
             _fac._repoCart.AddAllProductsAsItems(testUser.id, newCart.numero);
 
             carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 1);
+            Assert.Single(carts);
             Assert.NotNull(carts[0].items);
             Assert.NotEmpty(carts[0].items!);
 
 
             _fac._repoCart.Remove(newCart);
             carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 0);
+            Assert.Empty(carts);
 
             _fac._repoCartItems.GetAll(testUser);
         });
@@ -189,7 +189,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
 
             Cart[]
                 carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 1);
+            Assert.Single(carts);
             Assert.NotNull(carts[0].items);
             Assert.Empty(carts[0].items!);
 
@@ -197,13 +197,13 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
                 newCart = carts[0];
 
             Product
-            newproduct1 = new Product()
+            newproduct1 = new()
             {
                 id = UNDEFINED,
                 name = "testproduct1",
                 unit = "",
             },
-            newproduct2 = new Product()
+            newproduct2 = new()
             {
                 id = UNDEFINED,
                 name = "testproduct2",
@@ -225,14 +225,14 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
             Assert.Throws<MySqlException>(() => _fac._repoCart.AddProduct(testUser, newCart.numero, product, qtt: 0, isdone: false));
 
             carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 1);
+            Assert.Single(carts);
             Assert.NotNull(carts[0].items);
             Assert.NotEmpty(carts[0].items!);
 
 
             _fac._repoCart.Remove(newCart);
             carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 0);
+            Assert.Empty(carts);
 
             _fac._repoCartItems.GetAll(testUser);
         });
@@ -252,7 +252,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
 
             Cart[]
                 carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 1);
+            Assert.Single(carts);
             Assert.NotNull(carts[0].items);
             Assert.Empty(carts[0].items!);
 
@@ -260,13 +260,13 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
                 newCart = carts[0];
 
             Product
-            newproduct1 = new Product()
+            newproduct1 = new()
             {
                 id = UNDEFINED,
                 name = "testproduct1",
                 unit = "",
             },
-            newproduct2 = new Product()
+            newproduct2 = new()
             {
                 id = UNDEFINED,
                 name = "testproduct2",
@@ -291,18 +291,17 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
                 quantity = 3,
                 isdone = false,
             };
-            //item2 = _fac._repoCart.AddProduct(testUser, newCart.numero, product, qtt: 0, isdone: false);
 
             _fac._repoCartItems.AddItem(testUser, newCart.numero, ref item1);
             Assert.Throws<MySqlException>(() => _fac._repoCart.AddProduct(testUser, newCart.numero, product, qtt: 0, isdone: false));
 
             carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 1);
+            Assert.Single(carts);
             Assert.NotNull(carts[0].items);
             Assert.NotEmpty(carts[0].items!);
             CartItem[]
-            founditem = carts[0].items!.Where(x =>
-            x.product.name == product.name && x.product.id == product.id).ToArray();
+            founditem = [.. carts[0].items!.Where(x =>
+            x.product.name == product.name && x.product.id == product.id)];
             Assert.Equal(1, founditem?.Length);
 
             Assert.NotNull(founditem);
@@ -312,8 +311,8 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
             _fac._repoCartItems.Update(testUser, newCart.numero, founditem[0]);
 
             carts = _fac._repoCart.GetAll(testUser);
-            founditem = carts[0].items!.Where(x =>
-            x.product.name == product.name && x.product.id == product.id && x.quantity == QTTU).ToArray();
+            founditem = [.. carts[0].items!.Where(x =>
+            x.product.name == product.name && x.product.id == product.id && x.quantity == QTTU)];
             Assert.Equal(1, founditem?.Length);
             Assert.NotNull(founditem);
             Assert.NotNull(founditem[0]);
@@ -321,8 +320,8 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
             _fac._repoCartItems.RemoveById(founditem[0].id);
 
             carts = _fac._repoCart.GetAll(testUser);
-            founditem = carts[0].items!.Where(x =>
-            x.product.name == product.name && x.product.id == product.id && x.quantity == QTTU).ToArray();
+            founditem = [.. carts[0].items!.Where(x =>
+            x.product.name == product.name && x.product.id == product.id && x.quantity == QTTU)];
             Assert.Equal(0, founditem?.Length);
             //Assert.Empty(founditem);
             //Assert.NotNull(founditem[0]);
@@ -331,7 +330,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
 
             _fac._repoCart.Remove(newCart);
             carts = _fac._repoCart.GetAll(testUser);
-            Assert.True(carts.Length == 0);
+            Assert.Empty(carts);
 
             _fac._repoCartItems.GetAll(testUser);
         });

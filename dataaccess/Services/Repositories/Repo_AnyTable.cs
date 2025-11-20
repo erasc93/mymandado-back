@@ -1,6 +1,6 @@
 ﻿using models.tables;
 using Services.Dapper.Interfaces;
-using Services.Repositories.Abstractions;
+using Services.Repositories.Generics;
 using System.Data;
 
 namespace Services.Repositories;
