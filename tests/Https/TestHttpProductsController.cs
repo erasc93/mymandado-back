@@ -1,6 +1,7 @@
 ﻿//https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/test-min-api?view=aspnetcore-9.0
 
 using api_mandado.Controllers;
+using api_mandado.models;
 using core_mandado.Products;
 using core_mandado.Users;
 using Microsoft.Extensions.DependencyInjection;

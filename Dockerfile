@@ -10,7 +10,7 @@ RUN dotnet restore
 RUN dotnet publish -o out
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 as runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 ENV ASPNETCORE_ENVIRIONMENT=Production
 ENV ASPNETCORE_URLS=http://0.0.0.0:8080
 WORKDIR /App
