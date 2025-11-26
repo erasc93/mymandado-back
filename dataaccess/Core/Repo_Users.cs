@@ -1,29 +1,37 @@
 ﻿using core_mandado.Cart;
 using core_mandado.Users;
-using Google.Protobuf.WellKnownTypes;
 using models.tables;
 using Services.Dapper.Interfaces;
 using Services.Repositories.Generics;
-using Services.Repositories.Interfaces;
 using System.Data;
-
+using _crypt = BCrypt.Net;
+using Microsoft.Extensions.Configuration;
 namespace core;
 
 public class Repo_Users(
                             IQueries query,
-                            IRepo_Cart _repoCart
-                        ) : ARepository(query), IRepo_CREATE<User>, IRepo_READ<User>, IRepo_DELETE<User>, IRepo_UPDATE<User>,
+                            IRepo_Cart _repoCart,
+                            IConfiguration _config
+                        ) : ARepository(query),
                             IRepo_Users
 {
     public bool Login(LoginInfo login)
     {
-        return login.username == "manu" || login.username == "cleo";
+
+        string hashword = _crypt.BCrypt.HashPassword("x582y", _crypt.BCrypt.GenerateSalt());
+        (User? user, string storedHash) = GetUserWithHash(login.username);
+
+        string password = login.password ?? throw new Exception("should provide password");
+        bool isValidCredentials = _crypt.BCrypt.Verify(password, storedHash);
+
+        if(!isValidCredentials)  throw new Exception();
+        return isValidCredentials;
     }
     public User? GetUserByName(string userName)
     {
         string query;
         Dictionary<string, object>
-            param = new ()
+            param = new()
                     {
                         {"@username",userName},
                     };
@@ -35,7 +43,27 @@ public class Repo_Users(
             output = mndusers is not null
                     ? Factory.ToView(mndusers)
                     : null;
+
         return output;
+    }
+
+    public (User?, string hash) GetUserWithHash(string userName)
+    {
+        string query;
+        Dictionary<string, object>
+            param = new()
+                    {
+                        {"@username",userName},
+                    };
+        query = $"select * from USERS where usr_name=@username";
+        MND_USERS?
+            mndusers = _query.free.Query<MND_USERS>(query, param)
+            .FirstOrDefault();
+        User?
+            output = mndusers is not null
+                    ? Factory.ToView(mndusers)
+                    : null;
+        return (output, mndusers.usr_hashword);
     }
     public User[] GetAll()
     {
@@ -52,14 +80,14 @@ public class Repo_Users(
                   )];
         return output;
     }
-    public User AddByName(string userName)
+    public User AddByName(LoginInfo loginInfo, User.Role role)
     {
-
         MND_USERS
             mnduser = new()
             {
-                usr_name = userName,
-                usr_role = User.Role.friend
+                usr_name = loginInfo.username,
+                usr_hashword = _crypt.BCrypt.HashPassword(loginInfo.password??"1331", _crypt.BCrypt.GenerateSalt()),
+                usr_role = role
             };
         _query.crud.Add<MND_USERS>(ref mnduser);
 
@@ -72,35 +100,15 @@ public class Repo_Users(
             };
 
 
-         _repoCart.AddEmptyCart(output, 0);
+        _repoCart.AddEmptyCart(output, numero: 0, name: "cart", description: "");
 
         return output;
     }
 
-
-    public User AddByNameSafe(string userName)
-    {
-        MND_USERS mnduser;
-        User output;
-
-        mnduser = new MND_USERS
-        {
-            usr_name = userName,
-            usr_role = DEFAULTS.ROLE
-        };
-        _query.crud.Add(ref mnduser);
-        output = new User()
-        {
-            id = mnduser.usr_id,
-            name = mnduser.usr_name,
-            role = mnduser.usr_role
-        };
-        return output;
-    }
-    public void Add(ref User item)
-    {
-        item = AddByName(item.name);
-    }
+    //public void Add(ref User item,string password)
+    //{
+    //    item = AddByName(new() { username=item.name,password=password});
+    //}
 
     public bool Delete(User user)
     {
@@ -145,6 +153,7 @@ public class Repo_Users(
             throw new Exception(msg);
         }
     }
+
     private static class Factory
     {
         public static User ToView(MND_USERS u)

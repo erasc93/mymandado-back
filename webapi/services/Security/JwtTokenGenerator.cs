@@ -14,7 +14,6 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         _secretKey = secretKey;
         _jwtHandler = jwtHandler;
     }
-    //public string GenerateJwtTokenAsString(string username, bool isAdmin)
     public string GenerateJwtTokenAsString(Claim[] claims, double? lifeSpanInMinutes = 30)
     {
         string output;

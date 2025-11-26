@@ -9,7 +9,7 @@ public interface IRepo_Cart
     Cart[] GetAll(User user);
     Cart? GetBy(User testUser, int id);
 
-    Cart AddEmptyCart(User user, int cartnumber);
+    Cart AddEmptyCart(User user, int numero,string name,string description);
     void Remove(Cart cart);
 
     void Update(User user, Cart newCart);

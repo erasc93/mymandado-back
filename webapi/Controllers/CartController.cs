@@ -17,10 +17,7 @@ public class CartController(
 {
     private string _username { get; init; } = _claimsAccessor.GetUsername();
 
-    // GET: api/<CartItemsController>
-    //[HttpGet({"id"})]
-    [HttpGet()]
-    //[Authorize]
+    [HttpGet]
     public ActionResult<Cart[]> Get()
     {
         Cart[] output;
@@ -28,6 +25,18 @@ public class CartController(
             user = _repoUser.GetUserByName(_username)
             ?? throw new Exception($"user '{_username}' could not be found");
         output = _repoCart.GetAll(user) ?? [];
+        return Ok(output);
+    }
+
+    [HttpPost("{numero}")]
+    public ActionResult<Cart> Post(int numero)
+    {
+        //Cart[] output;
+        User?
+            user = _repoUser.GetUserByName(_username)
+            ?? throw new Exception($"user '{_username}' could not be found");
+        //output = _repoCart.GetAll(user) ?? [];
+        Cart output = _repoCart.AddEmptyCart(user, numero,name:"cart","");
         return Ok(output);
     }
 

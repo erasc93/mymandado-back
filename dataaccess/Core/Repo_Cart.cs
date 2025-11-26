@@ -19,19 +19,24 @@ public class Repo_Cart(IQueries queries,
 {
     private const string DESC = "";
     private const string NAME = "cart";
-    public Cart AddEmptyCart(User user, int cartnumber)
+    public Cart AddEmptyCart(User user, int numero, string name, string description)
     {
+        Cart output;
+        int car_crtnb = numero;
+
         MND_CART
             firstCart = new()
             {
                 //car_id = APP_PARAMS.instance.UNDEFINED,
                 car_usrid = user.id,
-                car_crtnb = cartnumber,
-                car_desc = DESC,
-                car_name = NAME,
+                car_crtnb = car_crtnb,
+                car_name = name,
+                car_desc = description,
             };
+
         _query.crud.Add<MND_CART>(ref firstCart);
-        return Factory.FillRAW(firstCart, [], []);
+        output = Factory.FillRAW(firstCart, [], []);
+        return output;
     }
 
     //public static void AddToCart(Product newproduct)
@@ -198,15 +203,15 @@ public class Repo_Cart(IQueries queries,
 
     private static class Factory
     {
-        public static Cart FillRAW(MND_CART car, MND_CART_ITEM[] mnd_cartitems, MND_PRODUCT[] products)
+        public static Cart FillRAW(MND_CART mnd_cart, MND_CART_ITEM[] mnd_cartitems, MND_PRODUCT[] products)
         {
             return new Cart
             {
-                id = car.car_id,
-                numero = car.car_crtnb,
-                userid = car.car_usrid,
-                name = car.car_name,
-                description = car.car_desc,
+                id = mnd_cart.car_id,
+                numero = mnd_cart.car_crtnb,
+                userid = mnd_cart.car_usrid,
+                name = mnd_cart.car_name,
+                description = mnd_cart.car_desc,
                 items = [.. (from MND_CART_ITEM itm in mnd_cartitems
                          select new CartItem
                          {

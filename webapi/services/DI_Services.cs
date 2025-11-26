@@ -11,6 +11,7 @@ using Services.Dapper.DBWire;
 using Services.Dapper.Interfaces;
 using Services.Dapper.Queries;
 using Services.Repositories;
+using System.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
@@ -23,10 +24,7 @@ public sealed class DI_Services
     {
         get
         {
-            if (_instance == null)
-            {
-                _instance = new DI_Services();
-            }
+            _instance ??= new DI_Services();
             return _instance;
 
         }
@@ -38,7 +36,6 @@ public sealed class DI_Services
         DBConnection(services, config);
         AddRepositories(services);
         AddTokenBasedAuthentication(services, config);
-        AddFactories(services);
     }
 
     private void AddTokenBasedAuthentication(IServiceCollection services, IConfiguration configurationManager)
@@ -49,7 +46,7 @@ public sealed class DI_Services
 
         if (secretKey is null)
         {
-            throw new ArgumentNullException("SecretKey was not provided");
+            throw new ConfigurationErrorsException("JwtSettings:SecretKey was not provided");
         }
 
         bool alreadyRegistered;
@@ -81,31 +78,6 @@ public sealed class DI_Services
         services.AddScoped<ClaimsAccessor>();
     }
 
-    //private void BearerBuilder(JwtBearerOptions options)
-    //{
-    //    string? secretKey;
-    //    secretKey = configurationManager["JwtSettings:SecretKey"];
-
-    //    if (secretKey is null)
-    //    {
-    //        throw new ArgumentNullException("SecretKey was not provided");
-    //    }
-
-    //    byte[]
-    //        bytes = Encoding.UTF8.GetBytes(secretKey);
-
-    //    options.TokenValidationParameters = new TokenValidationParameters
-    //    {
-    //        ValidateIssuer = false,
-    //        ValidateAudience = false,
-    //        IssuerSigningKey = new SymmetricSecurityKey(bytes)
-    //    };
-    //}
-
-    private void AddFactories(IServiceCollection services)
-    {
-        //services.AddSingleton<FactoryProducts>();
-    }
     private void AddRepositories(IServiceCollection services)
     {
         services.AddScoped<IRepo_Products, Repo_Products>();
@@ -117,12 +89,10 @@ public sealed class DI_Services
     }
     private void DBConnection(IServiceCollection services, IConfiguration config)
     {
-        string?
-            connectionString = config.GetConnectionString("DefaultConnection");
-        if (connectionString is null)
-        {
-            throw new ArgumentNullException("Connection String was not provided for MySQL access.");
-        }
+
+        string
+            connectionString = config.GetConnectionString("DefaultConnection")
+            ?? throw new ConfigurationErrorsException("Connection String was not provided for MySQL access.");
         services.AddSingleton<IConnectionInformation_DB>(new ConnectionInformation_DB(connectionString));
 
         services.AddScoped<ITransactionHandle, TransactionHandle>();
@@ -139,16 +109,6 @@ public sealed class DI_Services
         services.AddScoped<Repo_StoredProcedures>();
         services.AddScoped<Repo_TableInfos>();
 
-        //services.AddScoped<Repo_DbTable<T>>();
         services.AddScoped(typeof(Repo_AnyTable<>));
-    }
-
-    private void AddOpenApi(IServiceCollection services)
-    {
-        //builder.Services.AddScoped<WeatherForecast>();
-
-        // Add services to the container.
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        //builder.Services.AddOpenApi();
     }
 }

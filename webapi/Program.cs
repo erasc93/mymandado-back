@@ -1,4 +1,5 @@
 using api_mandado.services;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace api_mandado;
 
@@ -9,32 +10,9 @@ public class Program
     public static void Main(string[] args)
     {
 
-        WebApplicationBuilder builder;
         WebApplication app;
 
-
-        builder = WebApplication.CreateBuilder(args);
-
-
-
-        DI_Services.instance.AddDependencies(builder.Services, builder.Configuration);
-
-        builder.Services.AddControllers();
-        builder.Services.AddOpenApi();
-
-        builder.Services.AddCors((options) =>
-        {
-            options.AddPolicy(CORS_NAME,
-                (builder) =>
-                {
-                    builder.AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .AllowAnyOrigin();
-                });
-        });
-
-
-        app = builder.Build();
+        app = BuildWebApp(args);
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -49,5 +27,29 @@ public class Program
         app.MapControllers();
 
         app.Run();
+    }
+    private static WebApplication BuildWebApp(string[] args)
+    {
+        WebApplicationBuilder builder;
+
+        builder = WebApplication.CreateBuilder(args);
+
+
+
+        DI_Services.instance.AddDependencies(builder.Services, builder.Configuration);
+
+        builder.Services.AddControllers();
+        builder.Services.AddOpenApi()
+                        .AddCors((CorsOptions options) => options.AddPolicy(CORS_NAME, ConfigurePolicyCORS));
+
+
+        return builder.Build();
+    }
+
+    private static void ConfigurePolicyCORS(CorsPolicyBuilder builder)
+    {
+        builder.AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowAnyOrigin();
     }
 }

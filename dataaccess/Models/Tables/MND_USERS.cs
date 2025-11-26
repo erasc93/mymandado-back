@@ -11,5 +11,6 @@ public class MND_USERS : IDbTable
     public int usr_id { get; set; }
     public required User.Role usr_role { get; set; }
     public required string usr_name { get; set; }
+    public string usr_hashword { get; set; }
 
 }

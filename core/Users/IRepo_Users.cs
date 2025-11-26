@@ -8,9 +8,8 @@ public interface IRepo_Users
     User? GetUserByName(string userName);
 
     User[] GetAll();
-    User AddByName(string userName);
+    User AddByName(LoginInfo loginInfo,User.Role role);
 
-    void Add(ref User item);
 
     bool Delete(User user);
     void Update(User updated);

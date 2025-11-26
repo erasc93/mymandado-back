@@ -4,6 +4,7 @@ using core_mandado.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using _core=core_mandado.Users;
 
 namespace api_mandado.Controllers
 {
@@ -25,9 +26,11 @@ namespace api_mandado.Controllers
             Claim[] claims;
 
             User
-            user = _repoUsers.GetUserByName(loginInfo.username) ?? throw new Exception($"user {loginInfo.username} could not be found");
+            user = _repoUsers.GetUserByName(loginInfo.username) 
+            ?? throw new Exception($"user {loginInfo.username} could not be found");
             claims = UserClaimInfo(loginInfo);
             tokenstr = _jwtTokenGenerator.GenerateJwtTokenAsString(claims);
+
             token = new AuthResponse(user, tokenstr) ;
 
             return Ok(token);
@@ -44,12 +47,13 @@ namespace api_mandado.Controllers
         /// </summary>
         [HttpPost]
         [Authorize]
-        public ActionResult Create([FromBody] User appUser)
+        public ActionResult<User> Create([FromBody] LoginInfo loginInfo)
         {
             try
             {
-                _repoUsers.Add(ref appUser);
-                return Ok();
+                User 
+                    user = _repoUsers.AddByName(loginInfo,_core.User.Role.friend);
+                return Ok(user);
             }
             catch (Exception e)
             {
