@@ -64,14 +64,32 @@ public class Repo_Cart(IQueries queries,
         return output;
     }
 
-    public Cart? GetBy(User user, int cardId)
+    public Cart? GetBy(User user, int numero)
     {
         Cart? output = null;
 
         MND_CART?
-            mnd_carts = QueryCART(user, cardId);
+            mnd_carts = QueryCART(user, numero);
         MND_CART_ITEM[]
-            mnd_cartitems = QueryCART_ITEMS(user, cardId);
+            mnd_cartitems = QueryCART_ITEMS(user, numero);
+        MND_PRODUCT[]
+            products = QueryItemsPRODUCTS(mnd_cartitems);
+
+        if (mnd_carts != null)
+        {
+            output = Factory.BuildCart(mnd_carts, mnd_cartitems, products);
+        }
+
+        return output;
+    }
+    public Cart? GetBy(int id)
+    {
+        Cart? output = null;
+
+        MND_CART?
+            mnd_carts = QueryCART(id);
+        MND_CART_ITEM[]
+            mnd_cartitems = QueryCART_ITEMS(id);
         MND_PRODUCT[]
             products = QueryItemsPRODUCTS(mnd_cartitems);
 
@@ -94,7 +112,16 @@ public class Repo_Cart(IQueries queries,
 
     public void Update(User user, Cart newCart)
     {
-        MND_CART? cart = QueryCART(user, newCart.id);
+        MND_CART? cart = QueryCART(user, newCart.numero);
+        if (cart != null)
+        {
+            cart = Factory.FromView(newCart);
+            _query.crud.Update<MND_CART>(cart);
+        }
+    }
+    public void Update(Cart newCart)
+    {
+        MND_CART? cart = QueryCART(newCart.id);
         if (cart != null)
         {
             cart = Factory.FromView(newCart);
@@ -112,19 +139,45 @@ public class Repo_Cart(IQueries queries,
             mnd_carts = [.. _query.free.Query<MND_CART>(query, param)];
         return mnd_carts;
     }
-    private MND_CART? QueryCART(User user, int id)
+    private MND_CART? QueryCART(int id)
     {
         Dictionary<string, object>
             param = new() {
-                { "@car_usrid", user.id } ,
-                { "@car_id", id } ,
-            };
+                                { "@car_id", id } ,
+                            };
         string
-            query = "SELECT * FROM  CART WHERE car_id=@car_id AND car_usrid=@car_usrid;";
+            query = "SELECT * FROM  CART WHERE car_id=@car_id";
         MND_CART?
             mnd_carts = _query.free.Query<MND_CART>(query, param).First();
 
         return mnd_carts;
+    }
+    private MND_CART? QueryCART(User user, int cartNumber)
+    {
+        Dictionary<string, object>
+            param = new() {
+                                { "@car_usrid", user.id } ,
+                                { "@car_crtnb", cartNumber } ,
+                            };
+        string
+            query = "SELECT * FROM  CART WHERE car_usrid=@car_usrid AND car_crtnb=@car_crtnb;";
+        MND_CART?
+            mnd_carts = _query.free.Query<MND_CART>(query, param).First();
+
+        return mnd_carts;
+    }
+    private MND_CART_ITEM[] QueryCART_ITEMS(int id)
+    {
+        Dictionary<string, object>
+            param = new() {
+                { "@car_id", id },
+            };
+        string
+        query = "SELECT * from CART_ITEMS WHERE crt_id=@car_id";
+        MND_CART_ITEM[]
+            mnd_cartitems = [.. _query.free.Query<MND_CART_ITEM>(query, param)
+                                            .DistinctBy(item => (item.crt_crtnb, item.crt_prdid))];
+        return mnd_cartitems;
     }
     private MND_CART_ITEM[] QueryCART_ITEMS(User user, int crtnb)
     {

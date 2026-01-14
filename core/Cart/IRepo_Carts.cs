@@ -7,12 +7,13 @@ namespace core_mandado.Cart;
 public interface IRepo_Cart
 {
     Cart[] GetAll(User user);
-    Cart? GetBy(User testUser, int id);
+    Cart? GetBy(int id);
+    Cart? GetBy(User user, int numero);
 
     Cart AddEmptyCart(User user, int numero,string name,string description);
     void Remove(Cart cart);
 
-    void Update(User user, Cart newCart);
+    void Update(Cart newCart);
 
     void AddAllProductsAsItems(int userid, int cartid);
     CartItem AddProduct(User user, int cartnumber, Product product, int qtt, bool isdone = false);

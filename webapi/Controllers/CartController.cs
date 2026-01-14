@@ -21,9 +21,7 @@ public class CartController(
     public ActionResult<Cart[]> Get()
     {
         Cart[] output;
-        User?
-            user = _repoUser.GetUserByName(_username)
-            ?? throw new Exception($"user '{_username}' could not be found");
+        User user = _repoUser.GetUserByName(_username);
         output = _repoCart.GetAll(user) ?? [];
         return Ok(output);
     }
@@ -32,12 +30,18 @@ public class CartController(
     public ActionResult<Cart> Post(int numero)
     {
         //Cart[] output;
-        User?
-            user = _repoUser.GetUserByName(_username)
-            ?? throw new Exception($"user '{_username}' could not be found");
+        User user = _repoUser.GetUserByName(_username);
+            
         //output = _repoCart.GetAll(user) ?? [];
-        Cart output = _repoCart.AddEmptyCart(user, numero,name:"cart","");
+        Cart output = _repoCart.AddEmptyCart(user, numero, name: "cart", "");
         return Ok(output);
+    }
+    [HttpDelete("{numero}")]
+    public void Delete(int numero)
+    {
+        User user = _repoUser.GetUserByName(_username);
+        Cart? cart = _repoCart.GetBy(user, numero) ?? throw new Exception($"Cart numero {numero} was not found for user {user}");
+        _repoCart.Remove(cart);
     }
 
 }

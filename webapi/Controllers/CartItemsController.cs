@@ -28,16 +28,11 @@ public class CartItemsController(
     public ActionResult<CartItem[]> Get()
     {
         CartItem[] output;
-        User?
-            user = _repoUser.GetUserByName(_username)
-            ?? ThrowUserNotFound();
+        User user = _repoUser.GetUserByName(_username);
         output = _cartitemsRepository.GetAll(user) ?? [];
         return Ok(output);
     }
-    private User ThrowUserNotFound()
-    {
-        throw new Exception($"user {_username} could not be found");
-    }
+    
 
 
     // POST api/<CartItemsController>
@@ -45,8 +40,7 @@ public class CartItemsController(
     public ActionResult<CartItem> Post(int cartNumber, CartItem value)
     {
         //TODO: Get User from session guid
-        User?
-            user = _repoUser.GetUserByName(_username) ?? ThrowUserNotFound();
+        User user = _repoUser.GetUserByName(_username);
         //_repoCart.Add
         _cartitemsRepository.AddItem(user, cartNumber, ref value);
         return value;
@@ -55,14 +49,15 @@ public class CartItemsController(
     [HttpPut("{cartNumber}")]
     public void Put(int cartNumber, CartItem value)
     {
-        User? user = _repoUser.GetUserByName(_username) ?? ThrowUserNotFound();
+        
+        User user = _repoUser.GetUserByName(_username);
         _cartitemsRepository.Update(user, cartNumber, value);
     }
 
-    [HttpDelete("{id}")]
-    public void Delete(int id)
+    [HttpDelete("{crt_id}")]
+    public void Delete(int crt_id)
     {
-        _cartitemsRepository.RemoveById(id);
+        _cartitemsRepository.RemoveById(crt_id);
     }
 
 

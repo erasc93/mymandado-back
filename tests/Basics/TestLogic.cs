@@ -32,7 +32,7 @@ public class TestLogic(MymandadoWebAppFactory _fac) : IClassFixture<MymandadoWeb
             u = _fac._repoUsers.GetUserByName(userName);
             Assert.Null(u);
 
-            u = _fac._repoUsers.AddByName(userName);
+            u = _fac._repoUsers.AddByName(new() { username = userName, password = "password" });
             u = _fac._repoUsers.GetUserByName(userName);
             Assert.NotNull(u);
 

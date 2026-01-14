@@ -22,7 +22,8 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
                 testUser = BuildUser();
 
             Assert.False(UserExists_ByName(testUser));
-            _fac._repoUsers.Add(ref testUser);
+            //_fac._repoUsers.Add(ref testUser);
+            testUser = _fac._repoUsers.AddByName(new() { username = testUser.name, password = "password" });
             Assert.True(UserExists_ByName(testUser));
 
             Cart[]
@@ -33,7 +34,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
 
             int
             nextid = carts.Length + 1;
-            _fac._repoCart.AddEmptyCart(testUser, nextid);
+            _fac._repoCart.AddEmptyCart(testUser, nextid, "cart", "");
             carts = _fac._repoCart.GetAll(testUser);
             Assert.Equal(2, carts.Length);
             Assert.NotNull(carts[1].items);
@@ -51,7 +52,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
                 testUser = BuildUser();
 
             Assert.False(UserExists_ByName(testUser));
-            _fac._repoUsers.Add(ref testUser);
+            testUser = _fac._repoUsers.AddByName(new() { username = testUser.name, password = "password" });
             Assert.True(UserExists_ByName(testUser));
 
             Cart[]
@@ -61,7 +62,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
             Assert.Empty(carts[0].items!);
 
             Cart
-                newCart = _fac._repoCart.AddEmptyCart(testUser, 1);
+                newCart = _fac._repoCart.AddEmptyCart(testUser, 1, "cart", "");
             carts = _fac._repoCart.GetAll(testUser);
             Assert.Equal(2, carts.Length);
             Assert.NotNull(carts[1].items);
@@ -82,7 +83,8 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
                 testUser = BuildUser();
 
             Assert.False(UserExists_ByName(testUser));
-            _fac._repoUsers.Add(ref testUser);
+            testUser = _fac._repoUsers.AddByName(new() { username = testUser.name, password = "password" });
+
             Assert.True(UserExists_ByName(testUser));
 
             Cart[]
@@ -92,7 +94,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
             Assert.Empty(carts[0].items!);
 
             Cart
-                newCart = _fac._repoCart.AddEmptyCart(testUser, 1);
+                newCart = _fac._repoCart.AddEmptyCart(user: testUser, numero: 1, name: "cart", description: "");
             carts = _fac._repoCart.GetAll(testUser);
             Assert.Equal(2, carts.Length);
             Assert.NotNull(carts[1].items);
@@ -103,7 +105,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
             const string newname = "new name";
             newCart.name = newname;
             newCart.description = newdescription;
-            _fac._repoCart.Update(testUser, newCart);
+            _fac._repoCart.Update( newCart);
             Cart?
             updated = _fac._repoCart.GetBy(testUser, newCart.id);
             Assert.Equal(newdescription, updated?.description);
@@ -124,7 +126,8 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
                 testUser = BuildUser();
 
             Assert.False(UserExists_ByName(testUser));
-            _fac._repoUsers.Add(ref testUser);
+
+            testUser = _fac._repoUsers.AddByName(new() { username = testUser.name, password = "password" });
             Assert.True(UserExists_ByName(testUser));
 
             Cart[]
@@ -184,7 +187,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
                 testUser = BuildUser();
 
             Assert.False(UserExists_ByName(testUser));
-            _fac._repoUsers.Add(ref testUser);
+            testUser = _fac._repoUsers.AddByName(new() { username = testUser.name, password = "password" });
             Assert.True(UserExists_ByName(testUser));
 
             Cart[]
@@ -247,7 +250,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
                 testUser = BuildUser();
 
             Assert.False(UserExists_ByName(testUser));
-            _fac._repoUsers.Add(ref testUser);
+            testUser = _fac._repoUsers.AddByName(new() { username = testUser.name, password = "password" });
             Assert.True(UserExists_ByName(testUser));
 
             Cart[]

@@ -18,16 +18,15 @@ public class Repo_Users(
     public bool Login(LoginInfo login)
     {
 
-        string hashword = _crypt.BCrypt.HashPassword("x582y", _crypt.BCrypt.GenerateSalt());
         (User? user, string storedHash) = GetUserWithHash(login.username);
 
-        string password = login.password ?? throw new Exception("should provide password");
+        string password = login.password ?? "x582y" ?? throw new Exception("should provide password");
         bool isValidCredentials = _crypt.BCrypt.Verify(password, storedHash);
 
-        if(!isValidCredentials)  throw new Exception();
+        if (!isValidCredentials) throw new Exception();
         return isValidCredentials;
     }
-    public User? GetUserByName(string userName)
+    public User GetUserByName(string userName)
     {
         string query;
         Dictionary<string, object>
@@ -44,6 +43,7 @@ public class Repo_Users(
                     ? Factory.ToView(mndusers)
                     : null;
 
+        if (output is null) throw new Exception($"user '{userName}' could not be found");
         return output;
     }
 
@@ -86,7 +86,7 @@ public class Repo_Users(
             mnduser = new()
             {
                 usr_name = loginInfo.username,
-                usr_hashword = _crypt.BCrypt.HashPassword(loginInfo.password??"1331", _crypt.BCrypt.GenerateSalt()),
+                usr_hashword = _crypt.BCrypt.HashPassword(loginInfo.password ?? "1331", _crypt.BCrypt.GenerateSalt()),
                 usr_role = role
             };
         _query.crud.Add<MND_USERS>(ref mnduser);

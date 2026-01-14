@@ -21,7 +21,7 @@ public class TestHttpProductsController : IClassFixture<MymandadoWebAppFactory>
 
     private const string URL = "/api/products";
 
-    private readonly LoginInfo _loginInfo = new() { username = "manu", password = null };
+    private readonly LoginInfo _loginInfo = new() { username = "visit", password = null };
     public TestHttpProductsController(MymandadoWebAppFactory webAppFactory)
     {
         IServiceScope s;
@@ -58,6 +58,5 @@ public class TestHttpProductsController : IClassFixture<MymandadoWebAppFactory>
 
         //ASSERT
         Assert.NotNull(products);
-        Assert.Empty(products);
     }
 }

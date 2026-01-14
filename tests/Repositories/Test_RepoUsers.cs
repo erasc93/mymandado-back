@@ -30,7 +30,7 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
             testUser = _fac._repoUsers.GetUserByName(userName);
             Assert.Null(testUser);
 
-            testUser = _fac._repoUsers.AddByName(userName);
+            testUser = _fac._repoUsers.AddByName(new() { username = userName, password = "password" });
             testUser = _fac._repoUsers.GetUserByName(userName);
             Assert.NotNull(testUser);
             userWhenFound = testUser;
@@ -67,8 +67,7 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
                 Assert.NotEmpty(allUsers);
                 testUser = _fac._repoUsers.GetUserByName(userName);
                 Assert.Null(testUser);
-
-                testUser = _fac._repoUsers.AddByName(userName);
+                testUser = _fac._repoUsers.AddByName(new() { username = userName, password = "password" });
                 testUser = _fac._repoUsers.GetUserByName(userName);
                 Assert.NotNull(testUser);
             });
@@ -96,8 +95,7 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
                 Assert.NotEmpty(allUsers);
                 testUser = _fac._repoUsers.GetUserByName(userName);
                 Assert.Null(testUser);
-
-                testUser = _fac._repoUsers.AddByName(userName);
+                testUser = _fac._repoUsers.AddByName(new() { username = userName, password = "password" });
                 testUser = _fac._repoUsers.GetUserByName(userName);
                 Assert.NotNull(testUser);
             });
