@@ -88,15 +88,14 @@ public class Repo_Cart(IQueries queries,
 
         MND_CART?
             mnd_carts = QueryCART(id);
+        if (mnd_carts is null) return null;
+
         MND_CART_ITEM[]
-            mnd_cartitems = QueryCART_ITEMS(id);
+            mnd_cartitems = QueryCART_ITEMS(mnd_carts.car_usrid, mnd_carts.car_crtnb);
         MND_PRODUCT[]
             products = QueryItemsPRODUCTS(mnd_cartitems);
 
-        if (mnd_carts != null)
-        {
-            output = Factory.BuildCart(mnd_carts, mnd_cartitems, products);
-        }
+        output = Factory.BuildCart(mnd_carts, mnd_cartitems, products);
 
         return output;
     }
@@ -148,7 +147,7 @@ public class Repo_Cart(IQueries queries,
         string
             query = "SELECT * FROM  CART WHERE car_id=@car_id";
         MND_CART?
-            mnd_carts = _query.free.Query<MND_CART>(query, param).First();
+            mnd_carts = _query.free.Query<MND_CART>(query, param).FirstOrDefault();
 
         return mnd_carts;
     }
@@ -162,18 +161,19 @@ public class Repo_Cart(IQueries queries,
         string
             query = "SELECT * FROM  CART WHERE car_usrid=@car_usrid AND car_crtnb=@car_crtnb;";
         MND_CART?
-            mnd_carts = _query.free.Query<MND_CART>(query, param).First();
+            mnd_carts = _query.free.Query<MND_CART>(query, param).FirstOrDefault();
 
         return mnd_carts;
     }
-    private MND_CART_ITEM[] QueryCART_ITEMS(int id)
+    private MND_CART_ITEM[] QueryCART_ITEMS(int userId, int cartNumber)
     {
         Dictionary<string, object>
             param = new() {
-                { "@car_id", id },
+                { "@car_usrid", userId },
+                { "@car_crtnb", cartNumber },
             };
         string
-        query = "SELECT * from CART_ITEMS WHERE crt_id=@car_id";
+        query = "SELECT * from CART_ITEMS WHERE crt_usrid=@car_usrid AND crt_crtnb=@car_crtnb;";
         MND_CART_ITEM[]
             mnd_cartitems = [.. _query.free.Query<MND_CART_ITEM>(query, param)
                                             .DistinctBy(item => (item.crt_crtnb, item.crt_prdid))];
@@ -205,6 +205,8 @@ public class Repo_Cart(IQueries queries,
     }
     private MND_PRODUCT[] QueryItemsPRODUCTS(MND_CART_ITEM[] mnd_cartitems)
     {
+        if (mnd_cartitems.Length == 0) return [];
+
         Dictionary<string, object>
             param = new(){
                          {"@prd_id",(from itms in mnd_cartitems

@@ -7,60 +7,48 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api_mandado.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
-public class ProductsController : ControllerBase
+public class ProductsController(IRepo_Products _productsRepository) : ControllerBase
 {
-    private IRepo_Products _productsRepository { get; init; }
-    private string? username { get; init; }
-    private ClaimsAccessor _svc_context { get; init; }
-    public ProductsController(
-        IRepo_Products productsRepo,
-        ClaimsAccessor svc_context
-        )
-    {
-        _svc_context = svc_context;
-        _productsRepository = productsRepo;
-        username = _svc_context.GetUsername();
-    }
     // GET: api/<ProductsController>
     [HttpGet]
-    [Authorize]
     public ActionResult<Product[]> Get()
     {
-        Product[] output;
-        output = _productsRepository.GetAll();
-        return output;
+        Product[] output = _productsRepository.GetAll();
+        return Ok(output);
     }
 
     // GET api/<ProductsController>/5
     [HttpGet("{id}")]
-    public Product? Get(int id)
+    public ActionResult<Product> Get(int id)
     {
-        Product? output;
-        output = _productsRepository.GetById(id);
-        return output;
+        Product? output = _productsRepository.GetById(id);
+        return output is null ? NotFound() : Ok(output);
     }
 
     // POST api/<ProductsController>
     [HttpPost]
-    public ActionResult<Product> Post( Product value)
+    public ActionResult<Product> Post([FromBody] Product value)
     {
         _productsRepository.Add(ref value);
         return CreatedAtAction(nameof(Get), new { value.id }, value);
     }
 
     [HttpPut]
-    public void Put([FromBody] Product value)
+    public IActionResult Put([FromBody] Product value)
     {
         _productsRepository.Update(value);
+        return NoContent();
     }
 
     // DELETE api/<ProductsController>/5
     [HttpDelete("{id}")]
-    public void Delete(int id)
+    public IActionResult Delete(int id)
     {
         _productsRepository.RemoveItem(id);
+        return NoContent();
     }
 
 

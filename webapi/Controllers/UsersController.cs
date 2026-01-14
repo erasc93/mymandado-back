@@ -19,20 +19,22 @@ namespace api_mandado.Controllers
         /// <param name="loginInfo">{ username :string,  password :string }</param>
         /// <returns>jwt token string </returns>
         [HttpPost("login")]
-        public ObjectResult Login(LoginInfo loginInfo)
+        public ActionResult<AuthResponse> Login(LoginInfo loginInfo)
         {
-            AuthResponse token;
-            string tokenstr;
-            Claim[] claims;
-            User user;
+            if (string.IsNullOrWhiteSpace(loginInfo.username)) return BadRequest();
 
-            user= _repoUsers.GetUserByName(loginInfo.username);
-            claims = UserClaimInfo(loginInfo);
-            tokenstr = _jwtTokenGenerator.GenerateJwtTokenAsString(claims);
-
-            token = new AuthResponse(user, tokenstr);
-
-            return Ok(token);
+            try
+            {
+                User user = _repoUsers.GetUserByName(loginInfo.username);
+                _repoUsers.Login(loginInfo);
+                Claim[] claims = UserClaimInfo(user);
+                string tokenstr = _jwtTokenGenerator.GenerateJwtTokenAsString(claims);
+                return new AuthResponse(user, tokenstr);
+            }
+            catch
+            {
+                return Unauthorized();
+            }
         }
         [HttpGet]
         public string[] GetUserNames()
@@ -62,17 +64,13 @@ namespace api_mandado.Controllers
         }
 
         // --- --- --- 
-        private Claim[] UserClaimInfo(LoginInfo loginInfo)
+        private static Claim[] UserClaimInfo(_core.User user)
         {
-            Claim[] claims;
-            bool isAdmin;
-
-            isAdmin = _repoUsers.Login(loginInfo);
-            claims = [
-                        new Claim(type:"username", value:loginInfo.username),
+            bool isAdmin = user.role == _core.User.Role.admin;
+            return [
+                        new Claim(type:"username", value:user.name),
                         new Claim(type:"isAdmin", isAdmin.ToString()),
-                     ];
-            return claims;
+                   ];
         }
 
     }

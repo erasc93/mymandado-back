@@ -20,10 +20,15 @@ public class Repo_Users(
 
         (User? user, string storedHash) = GetUserWithHash(login.username);
 
-        string password = login.password ?? "x582y" ?? throw new Exception("should provide password");
+        if (user is null || string.IsNullOrWhiteSpace(storedHash))
+        {
+            throw new Exception("User not found");
+        }
+
+        string password = login.password ?? "x582y";
         bool isValidCredentials = _crypt.BCrypt.Verify(password, storedHash);
 
-        if (!isValidCredentials) throw new Exception();
+        if (!isValidCredentials) throw new Exception("Invalid credentials");
         return isValidCredentials;
     }
     public User GetUserByName(string userName)
@@ -63,7 +68,7 @@ public class Repo_Users(
             output = mndusers is not null
                     ? Factory.ToView(mndusers)
                     : null;
-        return (output, mndusers.usr_hashword);
+        return (output, mndusers?.usr_hashword ?? string.Empty);
     }
     public User[] GetAll()
     {
