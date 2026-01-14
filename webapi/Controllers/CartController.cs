@@ -36,22 +36,26 @@ public class CartController(
     }
 
     [HttpPost]
-    public ActionResult<Cart> Post()
+    public ActionResult<Cart> Post([FromBody] CreateCartRequest? request)
     {
         if (!TryGetUser(out User user, out ActionResult error)) return error;
 
         int nextNumero = NextCartNumber(user);
-        Cart output = _repoCart.AddEmptyCart(user, nextNumero, name: "cart", "");
+        string name = string.IsNullOrWhiteSpace(request?.name) ? "cart" : request!.name.Trim();
+        string description = request?.description ?? string.Empty;
+        Cart output = _repoCart.AddEmptyCart(user, nextNumero, name, description);
         return Ok(output);
     }
 
     [HttpPost("{numero}")]
-    public ActionResult<Cart> Post(int numero)
+    public ActionResult<Cart> Post(int numero, [FromBody] CreateCartRequest? request)
     {
         if (!TryGetUser(out User user, out ActionResult error)) return error;
         if (_repoCart.GetBy(user, numero) is not null) return Conflict($"Cart {numero} already exists.");
 
-        Cart output = _repoCart.AddEmptyCart(user, numero, name: "cart", "");
+        string name = string.IsNullOrWhiteSpace(request?.name) ? "cart" : request!.name.Trim();
+        string description = request?.description ?? string.Empty;
+        Cart output = _repoCart.AddEmptyCart(user, numero, name, description);
         return Ok(output);
     }
 
@@ -93,6 +97,28 @@ public class CartController(
 
         _repoCart.Remove(cart);
         return NoContent();
+    }
+
+    [HttpPut("{cartId}")]
+    public ActionResult<Cart> Put(int cartId, [FromBody] UpdateCartRequest request)
+    {
+        if (!TryGetUser(out User user, out ActionResult error)) return error;
+
+        Cart? cart = _repoCart.GetBy(cartId);
+        if (cart is null) return NotFound();
+        if (cart.userid != user.id) return Forbid();
+
+        string name = request.name?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(name)) return BadRequest("Name is required.");
+
+        cart.name = name;
+        if (request.description is not null)
+        {
+            cart.description = request.description;
+        }
+
+        _repoCart.Update(cart);
+        return Ok(cart);
     }
 
     private int NextCartNumber(User user)

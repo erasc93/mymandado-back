@@ -69,6 +69,21 @@ public sealed class DI_Services
                                                                             ValidateAudience = false,
                                                                             IssuerSigningKey = new SymmetricSecurityKey(bytes)
                                                                         };
+
+                                                                        options.Events = new JwtBearerEvents
+                                                                        {
+                                                                            OnMessageReceived = context =>
+                                                                            {
+                                                                                string accessToken = context.Request.Query["access_token"];
+                                                                                var path = context.HttpContext.Request.Path;
+                                                                                if (!string.IsNullOrEmpty(accessToken)
+                                                                                    && path.StartsWithSegments("/hubs/cart"))
+                                                                                {
+                                                                                    context.Token = accessToken;
+                                                                                }
+                                                                                return Task.CompletedTask;
+                                                                            }
+                                                                        };
                                                                     });
 
         }

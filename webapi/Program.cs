@@ -1,4 +1,5 @@
 using api_mandado.services;
+using api_mandado.Hubs;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace api_mandado;
@@ -25,6 +26,7 @@ public class Program
         app.UseAuthentication();//
         app.UseAuthorization();
         app.MapControllers();
+        app.MapHub<CartHub>("/hubs/cart");
 
         app.Run();
     }
@@ -39,6 +41,7 @@ public class Program
         DI_Services.instance.AddDependencies(builder.Services, builder.Configuration);
 
         builder.Services.AddControllers();
+        builder.Services.AddSignalR();
         builder.Services.AddOpenApi()
                         .AddCors((CorsOptions options) => options.AddPolicy(CORS_NAME, ConfigurePolicyCORS));
 

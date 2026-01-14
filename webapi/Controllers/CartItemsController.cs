@@ -1,9 +1,12 @@
 ﻿using api_mandado.services;
+using api_mandado.Hubs;
+using api_mandado.models;
 using core_mandado.Cart;
 using core_mandado.Users;
 using _user=core_mandado.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,7 +20,8 @@ public class CartItemsController(
         IRepo_Cart _repoCart,
         IRepo_CartShares _repoCartShares,
         IRepo_Users _repoUser,
-        ClaimsAccessor _svc_context
+        ClaimsAccessor _svc_context,
+        IHubContext<CartHub> _hubContext
     ) : ControllerBase
 {
     // GET: api/<CartItemsController>
@@ -37,9 +41,11 @@ public class CartItemsController(
         if (!TryGetUser(out User user, out ActionResult error)) return error;
 
         int resolvedCartNumber = cartNumber ?? 0;
-        if (!CartExists(user, resolvedCartNumber)) return NotFound();
+        Cart? cart = _repoCart.GetBy(user, resolvedCartNumber);
+        if (cart is null) return NotFound();
 
         _cartitemsRepository.AddItem(user, resolvedCartNumber, ref value);
+        NotifyCartItemsChanged(cart.id, user, "item-added");
         return Ok(value);
     }
 
@@ -51,6 +57,7 @@ public class CartItemsController(
 
         User owner = BuildOwnerUser(cart.userid);
         _cartitemsRepository.AddItem(owner, cart.numero, ref value);
+        NotifyCartItemsChanged(cartId, user, "item-added");
         return Ok(value);
     }
 
@@ -58,10 +65,12 @@ public class CartItemsController(
     public IActionResult Put(int cartNumber, [FromBody] CartItem value)
     {
         if (!TryGetUser(out User user, out ActionResult error)) return error;
-        if (!CartExists(user, cartNumber)) return NotFound();
+        Cart? cart = _repoCart.GetBy(user, cartNumber);
+        if (cart is null) return NotFound();
         if (!ItemBelongsToUser(user, value.id)) return NotFound();
 
         _cartitemsRepository.Update(user, cartNumber, value);
+        NotifyCartItemsChanged(cart.id, user, "item-updated");
         return NoContent();
     }
 
@@ -74,6 +83,7 @@ public class CartItemsController(
 
         User owner = BuildOwnerUser(cart.userid);
         _cartitemsRepository.Update(owner, cart.numero, value);
+        NotifyCartItemsChanged(cartId, user, "item-updated");
         return NoContent();
     }
 
@@ -83,7 +93,14 @@ public class CartItemsController(
         if (!TryGetUser(out User user, out ActionResult error)) return error;
         if (!ItemBelongsToUser(user, crt_id)) return NotFound();
 
+        Cart? cart = _repoCart.GetAll(user)
+            .FirstOrDefault(c => c.items is not null && c.items.Any(item => item.id == crt_id));
+
         _cartitemsRepository.RemoveById(crt_id);
+        if (cart is not null)
+        {
+            NotifyCartItemsChanged(cart.id, user, "item-deleted");
+        }
         return NoContent();
     }
 
@@ -95,6 +112,7 @@ public class CartItemsController(
         if (cart.items is null || !cart.items.Any(item => item.id == crt_id)) return NotFound();
 
         _cartitemsRepository.RemoveById(crt_id);
+        NotifyCartItemsChanged(cartId, user, "item-deleted");
         return NoContent();
     }
 
@@ -115,9 +133,6 @@ public class CartItemsController(
             return false;
         }
     }
-
-    private bool CartExists(User user, int cartNumber)
-        => _repoCart.GetBy(user, cartNumber) is not null;
 
     private bool ItemBelongsToUser(User user, int itemId)
         => _cartitemsRepository.GetAll(user).Any(item => item.id == itemId);
@@ -150,5 +165,12 @@ public class CartItemsController(
             name = string.Empty,
             role = _user.User.Role.friend
         };
+    }
+
+    private void NotifyCartItemsChanged(int cartId, User user, string action)
+    {
+        CartChangeEvent payload = new(cartId, action, user.name);
+        _ = _hubContext.Clients.Group(CartHub.GroupName(cartId))
+            .SendAsync(CartHub.CartItemsChangedEvent, payload);
     }
 }
