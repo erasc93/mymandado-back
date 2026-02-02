@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access">
+  <Comment CommentText="Decor like pattern">
+    <Position X="16.251" Y="7.227" Height="0.342" Width="1.193" />
+  </Comment>
+  <Class Name="Services.Dapper.Queries.Queries" Collapsed="true">
+    <Position X="14.25" Y="7.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Public" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier />
+    <ShowAsAssociation>
+      <Property Name="free" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Services.Dapper.Queries.FreeQuery">
+    <Position X="14.25" Y="10.75" Width="2.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Services.Dapper.DBWire.ConnectionInformation_DB" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.25" Y="12.25" Width="2.25" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="Services.Dapper.Interfaces.IFreeQuery">
+    <Position X="14.25" Y="9.25" Width="2" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Services.Dapper.DBWire.IConnectionInformation_DB">
+    <Position X="17.25" Y="10.75" Width="2.25" />
+    <TypeIdentifier />
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

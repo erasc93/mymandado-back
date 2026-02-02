@@ -6,19 +6,37 @@ using System.Data;
 
 namespace Services.Dapper.Queries;
 
-public class FreeQuery(IConnectionInformation_DB _credentialDatabase, ITransactionHandle _transacHandle) : IFreeQuery
+public class FreeQuery(
+                            IConnectionInformation_DB _credentialDatabase,
+                            ITransactionHandle _transacHandle
+                       ) : IFreeQuery
 {
     public IEnumerable<T> Query<T>(string mySql, Dictionary<string, object>? param = null)
     {
-        IEnumerable<T>
-            output;
-        DynamicParameters?
-            parameters = param is null ? null : new DynamicParameters(param);
-        bool
-            useOwnConnection = _transacHandle.isConnectionClosed;
-        IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
+        IEnumerable<T> output;
 
-        if (useOwnConnection) { conn.Open(); }
+        bool useOwnConnection;
+        IDbConnection conn;
+        DynamicParameters? parameters;
+
+        useOwnConnection = _transacHandle.isConnectionClosed;
+        conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
+        parameters = param is null ? null : new DynamicParameters(param);
+
+        try
+        {
+            if (useOwnConnection) { conn.Open(); }
+        }
+        catch (Exception ex)
+        {
+            throw;
+            string msg=
+                $""""
+                failed using these credentials : 
+                {_credentialDatabase.ConnectionString}
+                """";
+            throw new Exception(msg, innerException: ex);
+        }
         output = conn.Query<T>(mySql, parameters, _transacHandle.transaction);
         if (useOwnConnection) { conn.Close(); }
 

@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access">
+  <Comment CommentText="CORE MODULE :&#xD;&#xA; - models&#xD;&#xA; - Business Logic">
+    <Position X="0.5" Y="2.681" Height="0.75" Width="1.319" />
+  </Comment>
+  <Comment CommentText="DATA ACCESS LAYER&#xD;&#xA;">
+    <Position X="0.512" Y="7.901" Height="0.458" Width="1.37" />
+  </Comment>
+  <Comment CommentText="API CONTROLLERS&#xD;&#xA;">
+    <Position X="0.5" Y="11.75" Height="0.37" Width="1.37" />
+  </Comment>
+  <Class Name="core_mandado.Cart.CartItem">
+    <Position X="7.5" Y="2.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="core_mandado.Products.Product">
+    <Position X="4" Y="2.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="core_mandado.Cart.Cart">
+    <Position X="5.75" Y="2.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="core_mandado.Users.User">
+    <Position X="2.25" Y="2.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="core_mandado.Users.User.Role" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="api_mandado.Controllers.CartController">
+    <Position X="5.75" Y="11.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Private" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAQCAAAAAAAAABAAAAAAAAACAEAAAAAAAAAAAAEAAg=</HashCode>
+      <FileName>Controllers\CartController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api_mandado.Controllers.CartItemsController">
+    <Position X="7.5" Y="11.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Private" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAQBAAgIAAAAACAEQCAAAAAAAAAAEAAw=</HashCode>
+      <FileName>Controllers\CartItemsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api_mandado.Controllers.ProductsController">
+    <Position X="4" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAACAEAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Controllers\ProductsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api_mandado.Controllers.UsersController">
+    <Position X="2.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAACAEAAAAAQAAAAAAA=</HashCode>
+      <FileName>Controllers\UsersController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="core.Repo_Cart" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.75" Y="8" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="core.Repo_CartItems" BaseTypeListCollapsed="true">
+    <Position X="7.5" Y="8" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="core.Repo_CartShares" BaseTypeListCollapsed="true">
+    <Position X="9.25" Y="8" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="core.Repo_Products" BaseTypeListCollapsed="true">
+    <Position X="4" Y="8" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="core.Repo_Users" BaseTypeListCollapsed="true">
+    <Position X="2.25" Y="8" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Services.Repositories.Generics.ARepository" Collapsed="true">
+    <Position X="6.75" Y="7" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Public" Collapsed="true" />
+    </Compartments>
+    <AssociationLine Name="_query" Type="Services.Dapper.Interfaces.IQueries">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.206" Y="0.104" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier />
+    <ShowAsAssociation>
+      <Property Name="_query" />
+    </ShowAsAssociation>
+  </Class>
+  <Interface Name="core_mandado.Cart.IRepo_Cart" Collapsed="true">
+    <Position X="5.75" Y="5.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Public" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="core_mandado.Cart.IRepo_CartShares" Collapsed="true">
+    <Position X="9.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="core_mandado.Products.IRepo_Products" Collapsed="true">
+    <Position X="4" Y="5.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="core_mandado.Cart.IRepo_CartItems" Collapsed="true">
+    <Position X="7.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="core_mandado.Users.IRepo_Users" Collapsed="true">
+    <Position X="2.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Services.Dapper.Interfaces.IQueries" Collapsed="true">
+    <Position X="9.25" Y="7" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Public" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier />
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

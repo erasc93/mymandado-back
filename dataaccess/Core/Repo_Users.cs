@@ -10,8 +10,8 @@ namespace core;
 
 public class Repo_Users(
                             IQueries query,
-                            IRepo_Cart _repoCart,
-                            IConfiguration _config
+                            IRepo_Cart _repoCart
+                            //IConfiguration _config
                         ) : ARepository(query),
                             IRepo_Users
 {

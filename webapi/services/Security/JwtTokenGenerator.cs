@@ -51,7 +51,6 @@ public class JwtTokenGenerator : IJwtTokenGenerator
                                         audience: null
                                      );
         return output;
-
     }
 
 }

@@ -105,10 +105,9 @@ public sealed class DI_Services
     }
     private void DBConnection(IServiceCollection services, IConfiguration config)
     {
-
-        string
-            connectionString = config.GetConnectionString("DefaultConnection")
-            ?? throw new ConfigurationErrorsException("Connection String was not provided for MySQL access.");
+        string 
+            connectionString = GetAzureVaultConnectionString(config);
+            //connectionString = GetConnectionString(config);
         services.AddSingleton<IConnectionInformation_DB>(new ConnectionInformation_DB(connectionString));
 
         services.AddScoped<ITransactionHandle, TransactionHandle>();
@@ -126,5 +125,16 @@ public sealed class DI_Services
         services.AddScoped<Repo_TableInfos>();
 
         services.AddScoped(typeof(Repo_AnyTable<>));
+    }
+    private string GetAzureVaultConnectionString(IConfiguration config)
+    {
+        return config["sct-cleeven-proj-mysqldb-default-connection"];
+    }
+    private string GetConnectionString(IConfiguration config)
+    {
+        string
+            connectionString = config.GetConnectionString("DefaultConnection")
+            ?? throw new ConfigurationErrorsException("Connection String was not provided for MySQL access.");
+        return connectionString;
     }
 }

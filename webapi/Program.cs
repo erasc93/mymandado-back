@@ -1,6 +1,8 @@
 using api_mandado.services;
 using api_mandado.Hubs;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Azure.Identity;
+using Microsoft.Extensions.Configuration;
 
 namespace api_mandado;
 
@@ -36,8 +38,7 @@ public class Program
 
         builder = WebApplication.CreateBuilder(args);
 
-
-
+        AddAzureVaultConfiguration(builder.Configuration);
         DI_Services.instance.AddDependencies(builder.Services, builder.Configuration);
 
         builder.Services.AddControllers();
@@ -47,6 +48,12 @@ public class Program
 
 
         return builder.Build();
+    }
+    private static void AddAzureVaultConfiguration(IConfigurationBuilder builder)
+    {
+        Uri vaultUri = new(@"https://kv-cleeven-prj-azure.vault.azure.net/");
+        DefaultAzureCredential cred = new();
+        builder.AddAzureKeyVault(vaultUri, cred);
     }
 
     private static void ConfigurePolicyCORS(CorsPolicyBuilder builder)
