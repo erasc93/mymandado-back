@@ -1,13 +1,6 @@
 ﻿using cons_mandado;
-using core_mandado.Users;
-using Services.Dapper.Interfaces;
 using VsConsole;
 
-
-
-IAppHost
-    host = DI_Console.Instance;
-IMenu
-    main = host.CreateInstance<MenuHome>();
-    //main = host.CreateInstance<MenuMain>();
-main.Open();
+IMenu 
+    menuHome = DI_Console.Instance.CreateInstance<MenuHome>(); // host.CreateInstance<MenuMain>();
+menuHome.Open();

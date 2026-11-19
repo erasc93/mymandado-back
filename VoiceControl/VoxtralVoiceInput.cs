@@ -18,35 +18,47 @@ public class VoxtralVoiceInput(
         HttpClient? httpClient = null
     ) : IVoiceInput
 {
+    /// <summary>Amplitude crête (16 bits) en dessous de laquelle on considère l'enregistrement comme du silence complet (~-48 dBFS).</summary>
+    private const int SILENCE_PEAK_THRESHOLD = 128;
+
     private readonly HttpClient _httpClient = httpClient ?? new();
 
     public async Task<string> CaptureTextAsync(CancellationToken cancellationToken = default)
     {
-        string wavPath;
-        Task<string> output;
-
-        wavPath = Path.Combine(Path.GetTempPath(), $"voice-{Guid.NewGuid():N}.wav");
+        string wavPath = Path.Combine(Path.GetTempPath(), $"voice-{Guid.NewGuid():N}.wav");
         try
         {
-            await WavFileWriter.WriteAsync(
+            WavWriteResult result = await WavFileWriter.WriteAsync(
                                             wavPath,
                                             ReadUntilStopRequested(_audioSource.ReadChunksAsync(), cancellationToken),
                                             settingsProvider.Settings.AudioCapture.SampleRate,
                                             settingsProvider.Settings.AudioCapture.Channels,
                                             CancellationToken.None
                                            );
-            output = TranscribeWavAsync(wavPath, cancellationToken);
-            return await output;
+
+            if (result.DataSize == 0)
+            {
+                return "Aucune donnée audio reçue — vérifiez 'Voice:AudioCapture:CaptureCommand' " +
+                       "(chemin ffmpeg + périphérique micro) dans appsettings.json.";
+            }
+            if (result.Peak < SILENCE_PEAK_THRESHOLD)
+            {
+                // Évite d'uploader un WAV de silence (appel API inutile, résultat vide) :
+                // message distinct pour distinguer "silence" de "Rien compris".
+                double db = result.Peak == 0 ? double.NegativeInfinity : 20 * Math.Log10(result.Peak / 32768.0);
+                return $"Silence complet détecté (crête {db:F0} dB) — le micro est-il actif et non muet ?";
+            }
+
+            return await TranscribeWavAsync(wavPath, cancellationToken);
         }
         finally
         {
-            if (!File.Exists(wavPath))
+            if (File.Exists(wavPath))
             {
                 File.Delete(wavPath);
             }
         }
     }
-
 
     /// <summary>Uploade le WAV sur l'endpoint de transcription et retourne le champ "text".</summary>
     private async Task<string> TranscribeWavAsync(string wavPath, CancellationToken cancellationToken)
