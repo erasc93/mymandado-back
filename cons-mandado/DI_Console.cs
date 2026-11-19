@@ -1,4 +1,9 @@
-﻿namespace api_mandado.services;
+﻿using Microsoft.Extensions.DependencyInjection;
+using VoiceControl;
+using VoiceControl.Audio;
+using VoiceControl.Settings;
+
+namespace cons_mandado;
 
 public class DI_Console : AHostBuilder,IAppHost
 {
@@ -9,6 +14,22 @@ public class DI_Console : AHostBuilder,IAppHost
     #endregion
     protected override void AddPlatformSpecificDependencies()
     {
-        //_services.AddSingleton<>();
+        AddMenus();
+        AddVoiceControls();
+    }
+
+    private void AddVoiceControls()
+    {
+        _services.AddSingleton<IVoiceSettingsProvider>(
+            new ConfigurationVoiceSettingsProvider(_config!));
+        _services.AddSingleton<IAudioSource, ProcessAudioSource>();
+        //_services.AddSingleton<IVoiceInput, GradiumVoiceInput>();
+        _services.AddSingleton<IVoiceInput, VoxtralVoiceInput>();
+    }
+
+    private void AddMenus()
+    {
+        _services.AddSingleton<MenuMain>();
+        _services.AddSingleton<MenuHome>();
     }
 }

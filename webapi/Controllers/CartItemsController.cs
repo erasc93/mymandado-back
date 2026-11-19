@@ -3,7 +3,7 @@ using api_mandado.Hubs;
 using api_mandado.models;
 using core_mandado.Cart;
 using core_mandado.Users;
-using _user=core_mandado.Users;
+using _user = core_mandado.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -45,7 +45,7 @@ public class CartItemsController(
         if (cart is null) return NotFound();
 
         _cartitemsRepository.AddItem(user, resolvedCartNumber, ref value);
-        NotifyCartItemsChanged(cart.id, user, "item-added");
+        NotifyCartItemsChanged(cart.id, user, action:"item-added");
         return Ok(value);
     }
 
@@ -57,7 +57,7 @@ public class CartItemsController(
 
         User owner = BuildOwnerUser(cart.userid);
         _cartitemsRepository.AddItem(owner, cart.numero, ref value);
-        NotifyCartItemsChanged(cartId, user, "item-added");
+        NotifyCartItemsChanged(cartId, user, action:"item-added");
         return Ok(value);
     }
 
@@ -170,7 +170,7 @@ public class CartItemsController(
     private void NotifyCartItemsChanged(int cartId, User user, string action)
     {
         CartChangeEvent payload = new(cartId, action, user.name);
-        _ = _hubContext.Clients.Group(CartHub.GroupName(cartId))
-            .SendAsync(CartHub.CartItemsChangedEvent, payload);
+        IClientProxy proxy = _hubContext.Clients.Group(CartHub.GroupName(cartId));
+        _ = proxy.SendAsync(CartHub.CartItemsChangedEvent, payload);
     }
 }

@@ -16,7 +16,10 @@ using System.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
-namespace api_mandado.services;
+using MySql.Data.MySqlClient;
+using System.Data;
+
+namespace cons_mandado;
 
 public sealed class DI_Services
 {
@@ -108,9 +111,10 @@ public sealed class DI_Services
     {
 
         string
-            connectionString = GetAzureVaultConnectionString(config);
-            //connectionString = GetConnectionString(config);
+            //connectionString = GetAzureVaultConnectionString(config);
+            connectionString = GetConnectionString(config);
         services.AddSingleton<IConnectionInformation_DB>(new ConnectionInformation_DB(connectionString));
+        services.AddSingleton<Func<string,IDbConnection>>((string connectionString)=>new MySqlConnection(connectionString));
 
         services.AddScoped<ITransactionHandle, TransactionHandle>();
         services.AddScoped<IQueries, Queries>();

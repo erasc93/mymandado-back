@@ -1,12 +1,14 @@
 ﻿using Dapper;
-using MySql.Data.MySqlClient;
 using Services.Dapper.DBWire;
 using Services.Dapper.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace Services.Dapper.Queries;
 
-public class FreeQueryAsync(IConnectionInformation_DB _credentialDatabase, ITransactionHandle _transacHandle) : IFreeQueryAsync
+public class FreeQueryAsync(IConnectionInformation_DB _credentialDatabase, ITransactionHandle _transacHandle, Func<string, IDbConnection> _facDbConnection) : IFreeQueryAsync
 {
     // --- --- --- FREE MySQL QUERY 
     public async Task<IEnumerable<T>> Query<T>(string mySql, Dictionary<string, object>? param)
@@ -21,7 +23,7 @@ public class FreeQueryAsync(IConnectionInformation_DB _credentialDatabase, ITran
         bool
             useOwnConnection = _transacHandle.isConnectionClosed;
 
-        IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
+        IDbConnection conn = (useOwnConnection) ? _facDbConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
         output = await conn.QueryAsync<T>(mySql, parameters, _transacHandle.transaction);
         if (useOwnConnection) { conn.Close(); }
@@ -38,7 +40,7 @@ public class FreeQueryAsync(IConnectionInformation_DB _credentialDatabase, ITran
         bool
             useOwnConnection = _transacHandle.isConnectionClosed;
 
-        IDbConnection conn = (useOwnConnection) ? new MySqlConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
+        IDbConnection conn = (useOwnConnection) ? _facDbConnection(_credentialDatabase.ConnectionString) : _transacHandle.connection!;
         if (useOwnConnection) { conn.Open(); }
         await conn.QueryAsync(sql: mySql, parameters, _transacHandle.transaction);
         if (useOwnConnection) { conn.Close(); }

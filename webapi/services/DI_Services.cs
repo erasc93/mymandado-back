@@ -3,21 +3,24 @@ using core;
 using core_mandado.Cart;
 using core_mandado.Products;
 using core_mandado.Users;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MySql.Data.MySqlClient;
 using Services.Dapper.DBWire;
 using Services.Dapper.Interfaces;
 using Services.Dapper.Queries;
 using Services.Repositories;
 using System.Configuration;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 namespace api_mandado.services;
 
-public sealed class DI_Services
+public sealed class DI_Services/**/
 {
     private static DI_Services? _instance;
     public static DI_Services instance
@@ -58,7 +61,7 @@ public sealed class DI_Services
             authBuilder = services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
 
             //authBuilder.AddJwtBearer(BearerBuilder);
-            authBuilder.AddJwtBearer((options) =>
+            authBuilder.AddJwtBearer((JwtBearerOptions options) =>
                                                                     {
                                                                         byte[]
                                                                             bytes = Encoding.UTF8.GetBytes(secretKey);
@@ -74,7 +77,7 @@ public sealed class DI_Services
                                                                         {
                                                                             OnMessageReceived = context =>
                                                                             {
-                                                                                string accessToken = context.Request.Query["access_token"];
+                                                                                string accessToken = context.Request.Query["access_token"]!;
                                                                                 var path = context.HttpContext.Request.Path;
                                                                                 if (!string.IsNullOrEmpty(accessToken)
                                                                                     && path.StartsWithSegments("/hubs/cart"))
@@ -101,14 +104,15 @@ public sealed class DI_Services
         services.AddScoped<IRepo_CartItems, Repo_CartItems>();
         services.AddScoped<IRepo_CartShares, Repo_CartShares>();
         services.AddScoped<IRepo_Users, Repo_Users>();
-        //services.AddScoped(typeof(IProductsRepository<Product>),typeof(RepoProducts));
     }
     private void DBConnection(IServiceCollection services, IConfiguration config)
     {
-        string 
-            connectionString = GetAzureVaultConnectionString(config);
-            //connectionString = GetConnectionString(config);
+        string
+            connectionString = GetConnectionString(config);
+            //connectionString = GetAzureVaultConnectionString(config);
+
         services.AddSingleton<IConnectionInformation_DB>(new ConnectionInformation_DB(connectionString));
+        services.AddSingleton<Func<string,IDbConnection>>((string connectionString)=>new MySqlConnection(connectionString));
 
         services.AddScoped<ITransactionHandle, TransactionHandle>();
         services.AddScoped<IQueries, Queries>();
@@ -128,7 +132,9 @@ public sealed class DI_Services
     }
     private string GetAzureVaultConnectionString(IConfiguration config)
     {
-        return config["sct-cleeven-proj-mysqldb-default-connection"];
+        return config["sct-cleeven-proj-mysqldb-default-connection"]
+            ?? throw new ConfigurationErrorsException("Connection String was not provided for MySQL access.");
+
     }
     private string GetConnectionString(IConfiguration config)
     {

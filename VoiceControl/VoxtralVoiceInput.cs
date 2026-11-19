@@ -1,5 +1,7 @@
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+
 using VoiceControl.Audio;
 using VoiceControl.Settings;
 
@@ -10,68 +12,88 @@ namespace VoiceControl;
 /// temporaire, l'uploade en multipart sur /v1/audio/transcriptions, retourne le champ "text".
 /// Approche batch : simple, adaptée aux énoncés courts complets.
 /// </summary>
-public class VoxtralVoiceInput : IVoiceInput
+public class VoxtralVoiceInput(
+        IVoiceSettingsProvider settingsProvider,
+        IAudioSource _audioSource,
+        HttpClient? httpClient = null
+    ) : IVoiceInput
 {
-    private readonly IVoiceSettingsProvider _settingsProvider;
-    private readonly IAudioSource _audioSource;
-    private readonly HttpClient _httpClient;
-
-    public VoxtralVoiceInput(IVoiceSettingsProvider settingsProvider, IAudioSource audioSource, HttpClient? httpClient = null)
-    {
-        _settingsProvider = settingsProvider;
-        _audioSource = audioSource;
-        _httpClient = httpClient ?? new HttpClient();
-    }
+    private readonly HttpClient _httpClient = httpClient ?? new();
 
     public async Task<string> CaptureTextAsync(CancellationToken cancellationToken = default)
     {
-        var provider = (ConfigurationVoiceSettingsProvider)_settingsProvider;
-        string apiKey = provider.RequireMistralApiKey();
-        VoiceSettings settings = _settingsProvider.Settings;
+        string wavPath;
+        Task<string> output;
 
-        string wavPath = Path.Combine(Path.GetTempPath(), $"voice-{Guid.NewGuid():N}.wav");
+        wavPath = Path.Combine(Path.GetTempPath(), $"voice-{Guid.NewGuid():N}.wav");
         try
         {
-            // En mode batch, l'annulation du token signifie "fin de saisie" :
-            // on arrête l'enregistrement proprement puis on upload quand même.
             await WavFileWriter.WriteAsync(
-                wavPath,
-                ReadUntilStopRequested(_audioSource.ReadChunksAsync(), cancellationToken),
-                settings.AudioCapture.SampleRate,
-                settings.AudioCapture.Channels,
-                CancellationToken.None);
-
-            using var request = new HttpRequestMessage(HttpMethod.Post, settings.Mistral.TranscriptionsUrl);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-
-            using var form = new MultipartFormDataContent();
-            form.Add(new StringContent(settings.Mistral.Model), "model");
-            await using FileStream fileStream = new(wavPath, FileMode.Open, FileAccess.Read);
-            using var fileContent = new StreamContent(fileStream);
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue("audio/wav");
-            form.Add(fileContent, "file", Path.GetFileName(wavPath));
-            request.Content = form;
-
-            using HttpResponseMessage response = await _httpClient.SendAsync(request, CancellationToken.None);
-            string body = await response.Content.ReadAsStringAsync(cancellationToken);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException(
-                    $"Transcription Voxtral a échoué ({(int)response.StatusCode}) : {body}");
-            }
-
-            using JsonDocument doc = JsonDocument.Parse(body);
-            return doc.RootElement.TryGetProperty("text", out JsonElement text)
-                ? text.GetString() ?? string.Empty
-                : string.Empty;
+                                            wavPath,
+                                            ReadUntilStopRequested(_audioSource.ReadChunksAsync(), cancellationToken),
+                                            settingsProvider.Settings.AudioCapture.SampleRate,
+                                            settingsProvider.Settings.AudioCapture.Channels,
+                                            CancellationToken.None
+                                           );
+            output = TranscribeWavAsync(wavPath, cancellationToken);
+            return await output;
         }
         finally
         {
-            if (File.Exists(wavPath))
+            if (!File.Exists(wavPath))
             {
                 File.Delete(wavPath);
             }
         }
+    }
+
+
+    /// <summary>Uploade le WAV sur l'endpoint de transcription et retourne le champ "text".</summary>
+    private async Task<string> TranscribeWavAsync(string wavPath, CancellationToken cancellationToken)
+    {
+        MistralSettings mistralSettings = settingsProvider.Settings.Mistral;
+        string apiMistralKey = settingsProvider.RequireMistralApiKey();
+
+        using HttpRequestMessage request = BuildTranscriptionRequest(wavPath, apiMistralKey, mistralSettings);
+
+        // Pas de token ici : même après un "stop", on va au bout de l'upload.
+        using HttpResponseMessage response = await _httpClient.SendAsync(request, CancellationToken.None);
+        string responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new HttpRequestException(
+                $"Transcription Voxtral a échoué ({(int)response.StatusCode}) : {responseBody}");
+        }
+
+        return ExtractTranscriptText(responseBody);
+    }
+
+    private static HttpRequestMessage BuildTranscriptionRequest(string wavPath, string apiKey, MistralSettings mistral)
+    {
+        HttpRequestMessage request = new(HttpMethod.Post, mistral.TranscriptionsUrl);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+
+        StringContent stringContent = new(mistral.Model);
+
+        StreamContent fileContent = new(new FileStream(wavPath, FileMode.Open, FileAccess.Read));
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("audio/wav");
+
+        request.Content = new MultipartFormDataContent()
+                            {
+                                { stringContent, "model"},
+                                { fileContent, "file", Path.GetFileName(wavPath) }
+                            };
+
+        return request;
+    }
+
+    private static string ExtractTranscriptText(string responseBody)
+    {
+        using JsonDocument doc = JsonDocument.Parse(responseBody);
+        return doc.RootElement.TryGetProperty("text", out JsonElement text)
+            ? text.GetString() ?? string.Empty
+            : string.Empty;
     }
 
     /// <summary>
@@ -81,9 +103,10 @@ public class VoxtralVoiceInput : IVoiceInput
     private static async IAsyncEnumerable<byte[]> ReadUntilStopRequested(
         IAsyncEnumerable<byte[]> source,
         CancellationToken stopToken,
-        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await using var enumerator = source.WithCancellation(stopToken).GetAsyncEnumerator();
+        await using ConfiguredCancelableAsyncEnumerable<byte[]>.Enumerator enumerator = source.WithCancellation(stopToken).GetAsyncEnumerator();
+
         while (true)
         {
             bool moved;

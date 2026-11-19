@@ -2,7 +2,6 @@ using api_mandado.services;
 using api_mandado.Hubs;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Azure.Identity;
-using Microsoft.Extensions.Configuration;
 
 namespace api_mandado;
 
@@ -27,6 +26,11 @@ public class Program
         app.UseCors(CORS_NAME);//
         app.UseAuthentication();//
         app.UseAuthorization();
+        //app.Use(async (context, next) =>
+        //{
+        //    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
+        //    await next();
+        //});
         app.MapControllers();
         app.MapHub<CartHub>("/hubs/cart");
 
@@ -38,7 +42,7 @@ public class Program
 
         builder = WebApplication.CreateBuilder(args);
 
-        AddAzureVaultConfiguration(builder.Configuration);
+        //AddAzureVaultConfiguration(builder.Configuration);
         DI_Services.instance.AddDependencies(builder.Services, builder.Configuration);
 
         builder.Services.AddControllers();
@@ -58,8 +62,10 @@ public class Program
 
     private static void ConfigurePolicyCORS(CorsPolicyBuilder builder)
     {
-        builder.AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowAnyOrigin();
+        builder
+            //.WithOrigins("http://localhost:4200")
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     }
 }

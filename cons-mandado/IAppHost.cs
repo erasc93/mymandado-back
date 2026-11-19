@@ -1,11 +1,10 @@
-﻿
-using api_mandado.services;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Azure.Identity;
+//using Azure.Identity;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Microsoft.Extensions.Configuration;
+using cons_mandado;
 //using SkillCraft.Category;
 //using SkillCraft.LearnDIYs;
 //using SkillCraft.MatchingTeacherStudent;
@@ -30,7 +29,7 @@ public abstract class AHostBuilder : IAppHost
         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
         .AddEnvironmentVariables();
 
-        AddAzureConfiguration(builder);
+        //AddAzureConfiguration(builder);
         
         _config = builder.Build();
 
@@ -38,12 +37,12 @@ public abstract class AHostBuilder : IAppHost
         AddPlatformSpecificDependencies();
         _serviceProvider = _services.BuildServiceProvider();
     }
-    private void AddAzureConfiguration(IConfigurationBuilder builder)
-    {
-        Uri vaultUri = new(@"https://kv-cleeven-prj-azure.vault.azure.net/");
-        DefaultAzureCredential cred = new();
-        builder.AddAzureKeyVault(vaultUri, cred);
-    }
+    //private void AddAzureConfiguration(IConfigurationBuilder builder)
+    //{
+    //    Uri vaultUri = new(@"https://kv-cleeven-prj-azure.vault.azure.net/");
+    //    DefaultAzureCredential cred = new();
+    //    builder.AddAzureKeyVault(vaultUri, cred);
+    //}
     private void AddCoreDependencies(IServiceCollection services, IConfiguration config)
     {
         DI_Services.instance.AddDependencies(services, config);

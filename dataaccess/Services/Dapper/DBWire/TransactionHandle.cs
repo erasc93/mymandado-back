@@ -1,7 +1,8 @@
-﻿using MySql.Data.MySqlClient;
+﻿using System;
 using System.Data;
 
 namespace Services.Dapper.DBWire;
+
 public interface ITransactionHandle
 {
     IDbConnection? connection { get; }
@@ -19,7 +20,7 @@ public interface ITransactionHandle
 }
 
 
-public class TransactionHandle(IConnectionInformation_DB _credentialDatabase) : ITransactionHandle
+public class TransactionHandle(IConnectionInformation_DB _credentialDatabase, Func<string, IDbConnection> _facDbConnection) : ITransactionHandle
 {
     public IDbConnection? connection { get; private set; }
     public IDbTransaction? transaction { get; private set; }
@@ -32,13 +33,13 @@ public class TransactionHandle(IConnectionInformation_DB _credentialDatabase) : 
     /// </summary>
     public void OpenConnectionBeginTransaction()
     {
-        connection = new MySqlConnection(_credentialDatabase.ConnectionString);
+        connection = _facDbConnection(_credentialDatabase.ConnectionString);
         connection.Open();
         transaction = connection.BeginTransaction();
     }
     public void Close()
     {
-        if (isConnectionClosed )
+        if (isConnectionClosed)
         {
             throw new DisposeProblem();
         }
