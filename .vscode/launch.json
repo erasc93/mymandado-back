@@ -1,0 +1,54 @@
+{
+   // Use IntelliSense to learn about possible attributes.
+   // Hover to view descriptions of existing attributes.
+   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+   "version": "0.2.0",
+   "configurations": [
+      {
+         "name": "C#: cons-mandado Debug",
+         "type": "dotnet",
+         "request": "launch",
+         "projectPath": "${workspaceFolder}/cons-mandado/cons-mandado.csproj"
+      },
+      {
+         "name": "C#: cons-mandado",
+         "type": "dotnet",
+         "request": "launch",
+         "projectPath": "${workspaceFolder}/cons-mandado/cons-mandado.csproj",
+         "launchSettingsProfile": "cons-mandado"
+      },
+      {
+         "name": "C#: tests-mandado",
+         "type": "dotnet",
+         "request": "launch",
+         "projectPath": "${workspaceFolder}/tests/tests-mandado.csproj",
+         "launchSettingsProfile": "tests-mandado"
+      },
+      {
+         "name": "C#: api-mandado [Default Configuration]",
+         "type": "dotnet",
+         "request": "launch",
+         "projectPath": "${workspaceFolder}/webapi/api-mandado.csproj"
+      },
+      {
+         "name": "C#: api-mandado [http]",
+         "type": "dotnet",
+         "request": "launch",
+         "projectPath": "${workspaceFolder}/webapi/api-mandado.csproj",
+         "launchSettingsProfile": "http"
+      },
+      {
+         "name": "C#: api-mandado [https]",
+         "type": "dotnet",
+         "request": "launch",
+         "projectPath": "${workspaceFolder}/webapi/api-mandado.csproj",
+         "launchSettingsProfile": "https"
+      },
+      {
+         "name": "C#: Debug Active File",
+         "type": "dotnet",
+         "request": "launch",
+         "projectPath": "${file}"
+      }
+   ]
+}
