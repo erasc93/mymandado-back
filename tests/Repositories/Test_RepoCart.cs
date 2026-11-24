@@ -107,7 +107,7 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
             newCart.description = newdescription;
             _fac._repoCart.Update( newCart);
             Cart?
-            updated = _fac._repoCart.GetBy(testUser, newCart.id);
+            updated = _fac._repoCart.GetBy(newCart.id);
             Assert.Equal(newdescription, updated?.description);
             Assert.Equal(newname, updated?.name);
 
