@@ -31,6 +31,7 @@ public class Program
         //    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
         //    await next();
         //});
+        app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
         app.MapControllers();
         app.MapHub<CartHub>("/hubs/cart");
 
