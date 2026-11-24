@@ -65,6 +65,21 @@ public class MymandadoWebAppFactory : ACustomWebApplicationFactory
         services.AddScoped<CartItemsController>();
     }
 
+    /// <summary>
+    /// GetUserByName lève une exception si l'utilisateur n'existe pas ; ce helper retourne null à la place.
+    /// </summary>
+    public User? TryGetUserByName(string userName)
+    {
+        try
+        {
+            return _repoUsers.GetUserByName(userName);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public void SecureTest(Action testfunction)
     {
         _queries.ExecuteInTransaction(() =>

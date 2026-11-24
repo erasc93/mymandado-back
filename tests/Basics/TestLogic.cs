@@ -29,15 +29,15 @@ public class TestLogic(MymandadoWebAppFactory _fac) : IClassFixture<MymandadoWeb
 
             string userName = "usertest";
             User? u;
-            u = _fac._repoUsers.GetUserByName(userName);
+            u = _fac.TryGetUserByName(userName);
             Assert.Null(u);
 
             u = _fac._repoUsers.AddByName(new() { username = userName, password = "password" });
-            u = _fac._repoUsers.GetUserByName(userName);
+            u = _fac.TryGetUserByName(userName);
             Assert.NotNull(u);
 
             _fac._repoUsers.Delete(u);
-            u = _fac._repoUsers.GetUserByName(userName);
+            u = _fac.TryGetUserByName(userName);
             Assert.Null(u);
         });
     }

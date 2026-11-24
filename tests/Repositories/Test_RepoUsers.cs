@@ -27,11 +27,11 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
             Assert.NotEmpty(allUsers);
             string
                 userName = "usertest13";
-            testUser = _fac._repoUsers.GetUserByName(userName);
+            testUser = _fac.TryGetUserByName(userName);
             Assert.Null(testUser);
 
             testUser = _fac._repoUsers.AddByName(new() { username = userName, password = "password" });
-            testUser = _fac._repoUsers.GetUserByName(userName);
+            testUser = _fac.TryGetUserByName(userName);
             Assert.NotNull(testUser);
             userWhenFound = testUser;
 
@@ -45,7 +45,7 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
             Assert.Empty(firstCart.items);
 
             _fac._repoUsers.Delete(testUser);
-            testUser = _fac._repoUsers.GetUserByName(userName);
+            testUser = _fac.TryGetUserByName(userName);
             Assert.Null(testUser);
 
             carts = _fac._repoCart.GetAll(userWhenFound);
@@ -65,10 +65,10 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
                 User[]
                     allUsers = _fac._repoUsers.GetAll();
                 Assert.NotEmpty(allUsers);
-                testUser = _fac._repoUsers.GetUserByName(userName);
+                testUser = _fac.TryGetUserByName(userName);
                 Assert.Null(testUser);
                 testUser = _fac._repoUsers.AddByName(new() { username = userName, password = "password" });
-                testUser = _fac._repoUsers.GetUserByName(userName);
+                testUser = _fac.TryGetUserByName(userName);
                 Assert.NotNull(testUser);
             });
             throw new TestFailureException();
@@ -76,7 +76,7 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
         catch (TestFailureException)
         {
 
-            testUser = _fac._repoUsers.GetUserByName(userName);
+            testUser = _fac.TryGetUserByName(userName);
             Assert.Null(testUser);
         }
     }
@@ -93,10 +93,10 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
                 User[]
                     allUsers = _fac._repoUsers.GetAll();
                 Assert.NotEmpty(allUsers);
-                testUser = _fac._repoUsers.GetUserByName(userName);
+                testUser = _fac.TryGetUserByName(userName);
                 Assert.Null(testUser);
                 testUser = _fac._repoUsers.AddByName(new() { username = userName, password = "password" });
-                testUser = _fac._repoUsers.GetUserByName(userName);
+                testUser = _fac.TryGetUserByName(userName);
                 Assert.NotNull(testUser);
             });
             throw new TestFailureException();
@@ -105,7 +105,7 @@ public class Test_RepoUsers(MymandadoWebAppFactory _fac) : IClassFixture<Mymanda
         {
             _fac.SecureTest(() =>
             {
-                testUser = _fac._repoUsers.GetUserByName(userName);
+                testUser = _fac.TryGetUserByName(userName);
                 Assert.Null(testUser);
             });
         }
