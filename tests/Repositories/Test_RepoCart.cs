@@ -356,8 +356,13 @@ public class Test_RepoCart(MymandadoWebAppFactory _fac) : IClassFixture<Mymandad
     }
     private bool UserExists_ByName(User user)
     {
-        User?
-            u = _fac._repoUsers.GetUserByName(user.name);
-        return u is not null;
+        try
+        {
+            return _fac._repoUsers.GetUserByName(user.name) is not null;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
