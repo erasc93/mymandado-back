@@ -76,8 +76,10 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
             cd /srv/app
-            export BACK_IMAGE_TAG="${{ inputs.image_tag || github.sha }}"
+            SHA="${{ inputs.image_tag || github.sha }}"
+            export BACK_IMAGE_TAG="${SHA:0:7}"
             docker compose -f docker-compose.prod.yml up -d db
             for f in db/migrations/*.sql; do
               echo "Applying $f"
