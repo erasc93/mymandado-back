@@ -66,7 +66,7 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "db/migrations"
-          target: "/srv/app/db/"
+          target: "/srv/app/db"
 
       - name: Deploy back on VPS
         uses: appleboy/ssh-action@v1
